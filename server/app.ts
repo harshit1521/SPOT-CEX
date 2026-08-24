@@ -15,10 +15,11 @@ app.use(cookieParser());
 
 // ---------------------------- import routes ----------------------------
 
-
+import user from "./src/routes/user.route.ts"
 
 // ---------------------------- route declaration ----------------------------
 
+app.use("api/v1/users", user);
 
 // ---------------------------- error handler ----------------------------
 
