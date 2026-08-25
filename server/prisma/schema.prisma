@@ -1,9 +1,3 @@
-// Prisma schema optimized for a centralized-exchange (CEX) roadmap.
-// - Uses PostgreSQL (set DATABASE_URL in env)
-// - Decimal for monetary values
-// - Proper relations, timestamps, and indexes for performance
-// - Composite uniques where appropriate (e.g., balances per currency)
-
 generator client {
   provider   = "prisma-client"
   output     = "./generated"
@@ -15,83 +9,75 @@ datasource db {
   provider = "postgresql"
 }
 
-// Use Decimal for money/quantities. Add @@index and @@unique to support typical CEX queries.
-
 model User {
-  id         Int       @id @default(autoincrement())
-  email      String    @unique
-  username   String    @unique
-  password   String
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-
-  // relations
-  balances   Balance[]
-  orders     Order[]
-  fills      Fill[]    @relation("userFills")
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  username  String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  balances  Balance[]
+  fills     Fill[]    @relation("userFills")
+  orders    Order[]
 }
 
 model Market {
-  id         Int       @id @default(autoincrement())
-  symbol     String    @unique
+  id         Int      @id @default(autoincrement())
+  symbol     String   @unique
   name       String
   baseAsset  String
   quoteAsset String
-  createdAt  DateTime  @default(now())
-
-  orders     Order[]
+  createdAt  DateTime @default(now())
   fills      Fill[]
+  orders     Order[]
 }
 
 model Order {
-  id            BigInt     @id @default(autoincrement())
-  user          User       @relation(fields: [userId], references: [id])
-  userId        Int
-  market        Market     @relation(fields: [marketId], references: [id])
-  marketId      Int
-  side          Side
-  orderType     OrderType
-  price         Decimal?   @db.Decimal(30, 10) // null for market orders
-  quantity      Decimal    @db.Decimal(30, 10)
-  filledQty     Decimal    @default(0) @db.Decimal(30, 10)
-  status        OrderStatus @default(PENDING)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-
-  // relations to fills (one order can be part of many fills)
-  buyFills      Fill[]     @relation("buyFills")
-  sellFills     Fill[]     @relation("sellFills")
+  id        BigInt      @id @default(autoincrement())
+  userId    Int
+  marketId  Int
+  side      Side
+  orderType OrderType
+  price     Decimal?    @db.Decimal(30, 10)
+  quantity  Decimal     @db.Decimal(30, 10)
+  filledQty Decimal     @default(0) @db.Decimal(30, 10)
+  status    OrderStatus @default(PENDING)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  buyFills  Fill[]      @relation("buyFills")
+  sellFills Fill[]      @relation("sellFills")
+  market    Market      @relation(fields: [marketId], references: [id])
+  user      User        @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([marketId, status])
 }
 
 model Fill {
-  id           BigInt    @id @default(autoincrement())
-  market       Market    @relation(fields: [marketId], references: [id])
-  marketId     Int
-  price        Decimal   @db.Decimal(30, 10)
-  quantity     Decimal   @db.Decimal(30, 10)
-  buyOrder     Order?    @relation("buyFills", fields: [buyOrderId], references: [id])
-  buyOrderId   BigInt?
-  sellOrder    Order?    @relation("sellFills", fields: [sellOrderId], references: [id])
-  sellOrderId  BigInt?
-  // optional user reference (the taker/initiator)
-  user         User?     @relation(fields: [userId], references: [id], name: "userFills")
-  userId       Int?
-  createdAt    DateTime  @default(now())
+  id          BigInt   @id @default(autoincrement())
+  marketId    Int
+  price       Decimal  @db.Decimal(30, 10)
+  quantity    Decimal  @db.Decimal(30, 10)
+  buyOrderId  BigInt?
+  sellOrderId BigInt?
+  userId      Int?
+  createdAt   DateTime @default(now())
+  buyOrder    Order?   @relation("buyFills", fields: [buyOrderId], references: [id])
+  market      Market   @relation(fields: [marketId], references: [id])
+  sellOrder   Order?   @relation("sellFills", fields: [sellOrderId], references: [id])
+  user        User?    @relation("userFills", fields: [userId], references: [id])
 
   @@index([marketId, createdAt])
 }
 
 model Balance {
-  id         Int      @id @default(autoincrement())
-  user       User     @relation(fields: [userId], references: [id])
-  userId     Int
-  currency   String
-  available  Decimal  @default(10000) @db.Decimal(30, 10)
-  locked     Decimal  @default(0) @db.Decimal(30, 10)
-  updatedAt  DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  currency  String
+  available Decimal  @default(0) @db.Decimal(30, 10)
+  locked    Decimal  @default(0) @db.Decimal(30, 10)
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, currency])
   @@index([userId])

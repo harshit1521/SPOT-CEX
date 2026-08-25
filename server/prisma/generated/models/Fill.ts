@@ -264,8 +264,8 @@ export type FillWhereInput = {
   sellOrderId?: Prisma.BigIntNullableFilter<"Fill"> | bigint | number | null
   userId?: Prisma.IntNullableFilter<"Fill"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Fill"> | Date | string
-  market?: Prisma.XOR<Prisma.MarketScalarRelationFilter, Prisma.MarketWhereInput>
   buyOrder?: Prisma.XOR<Prisma.OrderNullableScalarRelationFilter, Prisma.OrderWhereInput> | null
+  market?: Prisma.XOR<Prisma.MarketScalarRelationFilter, Prisma.MarketWhereInput>
   sellOrder?: Prisma.XOR<Prisma.OrderNullableScalarRelationFilter, Prisma.OrderWhereInput> | null
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
@@ -279,8 +279,8 @@ export type FillOrderByWithRelationInput = {
   sellOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  market?: Prisma.MarketOrderByWithRelationInput
   buyOrder?: Prisma.OrderOrderByWithRelationInput
+  market?: Prisma.MarketOrderByWithRelationInput
   sellOrder?: Prisma.OrderOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
 }
@@ -297,8 +297,8 @@ export type FillWhereUniqueInput = Prisma.AtLeast<{
   sellOrderId?: Prisma.BigIntNullableFilter<"Fill"> | bigint | number | null
   userId?: Prisma.IntNullableFilter<"Fill"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Fill"> | Date | string
-  market?: Prisma.XOR<Prisma.MarketScalarRelationFilter, Prisma.MarketWhereInput>
   buyOrder?: Prisma.XOR<Prisma.OrderNullableScalarRelationFilter, Prisma.OrderWhereInput> | null
+  market?: Prisma.XOR<Prisma.MarketScalarRelationFilter, Prisma.MarketWhereInput>
   sellOrder?: Prisma.XOR<Prisma.OrderNullableScalarRelationFilter, Prisma.OrderWhereInput> | null
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id">
@@ -338,8 +338,8 @@ export type FillCreateInput = {
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
-  market: Prisma.MarketCreateNestedOneWithoutFillsInput
   buyOrder?: Prisma.OrderCreateNestedOneWithoutBuyFillsInput
+  market: Prisma.MarketCreateNestedOneWithoutFillsInput
   sellOrder?: Prisma.OrderCreateNestedOneWithoutSellFillsInput
   user?: Prisma.UserCreateNestedOneWithoutFillsInput
 }
@@ -360,8 +360,8 @@ export type FillUpdateInput = {
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  market?: Prisma.MarketUpdateOneRequiredWithoutFillsNestedInput
   buyOrder?: Prisma.OrderUpdateOneWithoutBuyFillsNestedInput
+  market?: Prisma.MarketUpdateOneRequiredWithoutFillsNestedInput
   sellOrder?: Prisma.OrderUpdateOneWithoutSellFillsNestedInput
   user?: Prisma.UserUpdateOneWithoutFillsNestedInput
 }
@@ -658,8 +658,8 @@ export type FillCreateWithoutUserInput = {
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
-  market: Prisma.MarketCreateNestedOneWithoutFillsInput
   buyOrder?: Prisma.OrderCreateNestedOneWithoutBuyFillsInput
+  market: Prisma.MarketCreateNestedOneWithoutFillsInput
   sellOrder?: Prisma.OrderCreateNestedOneWithoutSellFillsInput
 }
 
@@ -794,8 +794,8 @@ export type FillCreateWithoutSellOrderInput = {
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
-  market: Prisma.MarketCreateNestedOneWithoutFillsInput
   buyOrder?: Prisma.OrderCreateNestedOneWithoutBuyFillsInput
+  market: Prisma.MarketCreateNestedOneWithoutFillsInput
   user?: Prisma.UserCreateNestedOneWithoutFillsInput
 }
 
@@ -866,8 +866,8 @@ export type FillUpdateWithoutUserInput = {
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  market?: Prisma.MarketUpdateOneRequiredWithoutFillsNestedInput
   buyOrder?: Prisma.OrderUpdateOneWithoutBuyFillsNestedInput
+  market?: Prisma.MarketUpdateOneRequiredWithoutFillsNestedInput
   sellOrder?: Prisma.OrderUpdateOneWithoutSellFillsNestedInput
 }
 
@@ -986,8 +986,8 @@ export type FillUpdateWithoutSellOrderInput = {
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  market?: Prisma.MarketUpdateOneRequiredWithoutFillsNestedInput
   buyOrder?: Prisma.OrderUpdateOneWithoutBuyFillsNestedInput
+  market?: Prisma.MarketUpdateOneRequiredWithoutFillsNestedInput
   user?: Prisma.UserUpdateOneWithoutFillsNestedInput
 }
 
@@ -1022,8 +1022,8 @@ export type FillSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   sellOrderId?: boolean
   userId?: boolean
   createdAt?: boolean
-  market?: boolean | Prisma.MarketDefaultArgs<ExtArgs>
   buyOrder?: boolean | Prisma.Fill$buyOrderArgs<ExtArgs>
+  market?: boolean | Prisma.MarketDefaultArgs<ExtArgs>
   sellOrder?: boolean | Prisma.Fill$sellOrderArgs<ExtArgs>
   user?: boolean | Prisma.Fill$userArgs<ExtArgs>
 }, ExtArgs["result"]["fill"]>
@@ -1037,8 +1037,8 @@ export type FillSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   sellOrderId?: boolean
   userId?: boolean
   createdAt?: boolean
-  market?: boolean | Prisma.MarketDefaultArgs<ExtArgs>
   buyOrder?: boolean | Prisma.Fill$buyOrderArgs<ExtArgs>
+  market?: boolean | Prisma.MarketDefaultArgs<ExtArgs>
   sellOrder?: boolean | Prisma.Fill$sellOrderArgs<ExtArgs>
   user?: boolean | Prisma.Fill$userArgs<ExtArgs>
 }, ExtArgs["result"]["fill"]>
@@ -1052,8 +1052,8 @@ export type FillSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   sellOrderId?: boolean
   userId?: boolean
   createdAt?: boolean
-  market?: boolean | Prisma.MarketDefaultArgs<ExtArgs>
   buyOrder?: boolean | Prisma.Fill$buyOrderArgs<ExtArgs>
+  market?: boolean | Prisma.MarketDefaultArgs<ExtArgs>
   sellOrder?: boolean | Prisma.Fill$sellOrderArgs<ExtArgs>
   user?: boolean | Prisma.Fill$userArgs<ExtArgs>
 }, ExtArgs["result"]["fill"]>
@@ -1071,20 +1071,20 @@ export type FillSelectScalar = {
 
 export type FillOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "marketId" | "price" | "quantity" | "buyOrderId" | "sellOrderId" | "userId" | "createdAt", ExtArgs["result"]["fill"]>
 export type FillInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  market?: boolean | Prisma.MarketDefaultArgs<ExtArgs>
   buyOrder?: boolean | Prisma.Fill$buyOrderArgs<ExtArgs>
+  market?: boolean | Prisma.MarketDefaultArgs<ExtArgs>
   sellOrder?: boolean | Prisma.Fill$sellOrderArgs<ExtArgs>
   user?: boolean | Prisma.Fill$userArgs<ExtArgs>
 }
 export type FillIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  market?: boolean | Prisma.MarketDefaultArgs<ExtArgs>
   buyOrder?: boolean | Prisma.Fill$buyOrderArgs<ExtArgs>
+  market?: boolean | Prisma.MarketDefaultArgs<ExtArgs>
   sellOrder?: boolean | Prisma.Fill$sellOrderArgs<ExtArgs>
   user?: boolean | Prisma.Fill$userArgs<ExtArgs>
 }
 export type FillIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  market?: boolean | Prisma.MarketDefaultArgs<ExtArgs>
   buyOrder?: boolean | Prisma.Fill$buyOrderArgs<ExtArgs>
+  market?: boolean | Prisma.MarketDefaultArgs<ExtArgs>
   sellOrder?: boolean | Prisma.Fill$sellOrderArgs<ExtArgs>
   user?: boolean | Prisma.Fill$userArgs<ExtArgs>
 }
@@ -1092,8 +1092,8 @@ export type FillIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $FillPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Fill"
   objects: {
-    market: Prisma.$MarketPayload<ExtArgs>
     buyOrder: Prisma.$OrderPayload<ExtArgs> | null
+    market: Prisma.$MarketPayload<ExtArgs>
     sellOrder: Prisma.$OrderPayload<ExtArgs> | null
     user: Prisma.$UserPayload<ExtArgs> | null
   }
@@ -1500,8 +1500,8 @@ readonly fields: FillFieldRefs;
  */
 export interface Prisma__FillClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  market<T extends Prisma.MarketDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MarketDefaultArgs<ExtArgs>>): Prisma.Prisma__MarketClient<runtime.Types.Result.GetResult<Prisma.$MarketPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   buyOrder<T extends Prisma.Fill$buyOrderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Fill$buyOrderArgs<ExtArgs>>): Prisma.Prisma__OrderClient<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  market<T extends Prisma.MarketDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MarketDefaultArgs<ExtArgs>>): Prisma.Prisma__MarketClient<runtime.Types.Result.GetResult<Prisma.$MarketPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   sellOrder<T extends Prisma.Fill$sellOrderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Fill$sellOrderArgs<ExtArgs>>): Prisma.Prisma__OrderClient<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   user<T extends Prisma.Fill$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Fill$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**

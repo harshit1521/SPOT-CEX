@@ -224,8 +224,8 @@ export type MarketWhereInput = {
   baseAsset?: Prisma.StringFilter<"Market"> | string
   quoteAsset?: Prisma.StringFilter<"Market"> | string
   createdAt?: Prisma.DateTimeFilter<"Market"> | Date | string
-  orders?: Prisma.OrderListRelationFilter
   fills?: Prisma.FillListRelationFilter
+  orders?: Prisma.OrderListRelationFilter
 }
 
 export type MarketOrderByWithRelationInput = {
@@ -235,8 +235,8 @@ export type MarketOrderByWithRelationInput = {
   baseAsset?: Prisma.SortOrder
   quoteAsset?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  orders?: Prisma.OrderOrderByRelationAggregateInput
   fills?: Prisma.FillOrderByRelationAggregateInput
+  orders?: Prisma.OrderOrderByRelationAggregateInput
 }
 
 export type MarketWhereUniqueInput = Prisma.AtLeast<{
@@ -249,8 +249,8 @@ export type MarketWhereUniqueInput = Prisma.AtLeast<{
   baseAsset?: Prisma.StringFilter<"Market"> | string
   quoteAsset?: Prisma.StringFilter<"Market"> | string
   createdAt?: Prisma.DateTimeFilter<"Market"> | Date | string
-  orders?: Prisma.OrderListRelationFilter
   fills?: Prisma.FillListRelationFilter
+  orders?: Prisma.OrderListRelationFilter
 }, "id" | "symbol">
 
 export type MarketOrderByWithAggregationInput = {
@@ -285,8 +285,8 @@ export type MarketCreateInput = {
   baseAsset: string
   quoteAsset: string
   createdAt?: Date | string
-  orders?: Prisma.OrderCreateNestedManyWithoutMarketInput
   fills?: Prisma.FillCreateNestedManyWithoutMarketInput
+  orders?: Prisma.OrderCreateNestedManyWithoutMarketInput
 }
 
 export type MarketUncheckedCreateInput = {
@@ -296,8 +296,8 @@ export type MarketUncheckedCreateInput = {
   baseAsset: string
   quoteAsset: string
   createdAt?: Date | string
-  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutMarketInput
   fills?: Prisma.FillUncheckedCreateNestedManyWithoutMarketInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutMarketInput
 }
 
 export type MarketUpdateInput = {
@@ -306,8 +306,8 @@ export type MarketUpdateInput = {
   baseAsset?: Prisma.StringFieldUpdateOperationsInput | string
   quoteAsset?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  orders?: Prisma.OrderUpdateManyWithoutMarketNestedInput
   fills?: Prisma.FillUpdateManyWithoutMarketNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutMarketNestedInput
 }
 
 export type MarketUncheckedUpdateInput = {
@@ -317,8 +317,8 @@ export type MarketUncheckedUpdateInput = {
   baseAsset?: Prisma.StringFieldUpdateOperationsInput | string
   quoteAsset?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  orders?: Prisma.OrderUncheckedUpdateManyWithoutMarketNestedInput
   fills?: Prisma.FillUncheckedUpdateManyWithoutMarketNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutMarketNestedInput
 }
 
 export type MarketCreateManyInput = {
@@ -529,13 +529,13 @@ export type MarketUncheckedUpdateWithoutFillsInput = {
  */
 
 export type MarketCountOutputType = {
-  orders: number
   fills: number
+  orders: number
 }
 
 export type MarketCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  orders?: boolean | MarketCountOutputTypeCountOrdersArgs
   fills?: boolean | MarketCountOutputTypeCountFillsArgs
+  orders?: boolean | MarketCountOutputTypeCountOrdersArgs
 }
 
 /**
@@ -551,15 +551,15 @@ export type MarketCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exten
 /**
  * MarketCountOutputType without action
  */
-export type MarketCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.OrderWhereInput
+export type MarketCountOutputTypeCountFillsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FillWhereInput
 }
 
 /**
  * MarketCountOutputType without action
  */
-export type MarketCountOutputTypeCountFillsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.FillWhereInput
+export type MarketCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OrderWhereInput
 }
 
 
@@ -570,8 +570,8 @@ export type MarketSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   baseAsset?: boolean
   quoteAsset?: boolean
   createdAt?: boolean
-  orders?: boolean | Prisma.Market$ordersArgs<ExtArgs>
   fills?: boolean | Prisma.Market$fillsArgs<ExtArgs>
+  orders?: boolean | Prisma.Market$ordersArgs<ExtArgs>
   _count?: boolean | Prisma.MarketCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["market"]>
 
@@ -604,8 +604,8 @@ export type MarketSelectScalar = {
 
 export type MarketOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "symbol" | "name" | "baseAsset" | "quoteAsset" | "createdAt", ExtArgs["result"]["market"]>
 export type MarketInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  orders?: boolean | Prisma.Market$ordersArgs<ExtArgs>
   fills?: boolean | Prisma.Market$fillsArgs<ExtArgs>
+  orders?: boolean | Prisma.Market$ordersArgs<ExtArgs>
   _count?: boolean | Prisma.MarketCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type MarketIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -614,8 +614,8 @@ export type MarketIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
 export type $MarketPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Market"
   objects: {
-    orders: Prisma.$OrderPayload<ExtArgs>[]
     fills: Prisma.$FillPayload<ExtArgs>[]
+    orders: Prisma.$OrderPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1018,8 +1018,8 @@ readonly fields: MarketFieldRefs;
  */
 export interface Prisma__MarketClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  orders<T extends Prisma.Market$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Market$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   fills<T extends Prisma.Market$fillsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Market$fillsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FillPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  orders<T extends Prisma.Market$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Market$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1448,30 +1448,6 @@ export type MarketDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
 }
 
 /**
- * Market.orders
- */
-export type Market$ordersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Order
-   */
-  select?: Prisma.OrderSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Order
-   */
-  omit?: Prisma.OrderOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.OrderInclude<ExtArgs> | null
-  where?: Prisma.OrderWhereInput
-  orderBy?: Prisma.OrderOrderByWithRelationInput | Prisma.OrderOrderByWithRelationInput[]
-  cursor?: Prisma.OrderWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.OrderScalarFieldEnum | Prisma.OrderScalarFieldEnum[]
-}
-
-/**
  * Market.fills
  */
 export type Market$fillsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1493,6 +1469,30 @@ export type Market$fillsArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   distinct?: Prisma.FillScalarFieldEnum | Prisma.FillScalarFieldEnum[]
+}
+
+/**
+ * Market.orders
+ */
+export type Market$ordersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Order
+   */
+  select?: Prisma.OrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Order
+   */
+  omit?: Prisma.OrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrderInclude<ExtArgs> | null
+  where?: Prisma.OrderWhereInput
+  orderBy?: Prisma.OrderOrderByWithRelationInput | Prisma.OrderOrderByWithRelationInput[]
+  cursor?: Prisma.OrderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.OrderScalarFieldEnum | Prisma.OrderScalarFieldEnum[]
 }
 
 /**
