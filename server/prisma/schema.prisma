@@ -89,7 +89,7 @@ model Balance {
   user       User     @relation(fields: [userId], references: [id])
   userId     Int
   currency   String
-  available  Decimal  @default(0) @db.Decimal(30, 10)
+  available  Decimal  @default(10000) @db.Decimal(30, 10)
   locked     Decimal  @default(0) @db.Decimal(30, 10)
   updatedAt  DateTime @updatedAt
 
