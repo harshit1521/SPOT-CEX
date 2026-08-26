@@ -23,6 +23,11 @@ export * from './enums.ts';
  */
 export type User = Prisma.UserModel
 /**
+ * Model EmailVerificationToken
+ * 
+ */
+export type EmailVerificationToken = Prisma.EmailVerificationTokenModel
+/**
  * Model Market
  * 
  */
