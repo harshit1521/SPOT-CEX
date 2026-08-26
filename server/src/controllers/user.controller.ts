@@ -10,7 +10,8 @@ import { prisma } from "../utils/db.ts";
 import { generateVerificationToken } from "../services/emailVerification.ts";
 import { resend } from "../utils/resend.ts";
 import { hashVerificationToken, sendVerificationEmail } from "../services/emailVerification.ts";
-import { z } from "zod";
+import { generateTokens } from "../services/tokenService.ts"
+import { setDefaultAutoSelectFamily } from "net";
 
 const user = {
 
@@ -29,7 +30,13 @@ const user = {
 
         // step 1 done
         const result = signUp.safeParse(req.body);
-        if (!result.success) throw new ApiError(400, "Validation failed", z.flattenError(result.error));
+        if (!result.success) {
+            throw new ApiError(
+                400,
+                "Validation failed",
+                result.error.issues.map((issue) => issue.message)
+            );
+        }
 
         // step 2 
         const { username, email, password } = result.data;
@@ -59,17 +66,78 @@ const user = {
 
     }),
 
-    signIn: () => {
+    signIn: asyncHandler(async ( req: Request, res: Response) => {
 
         // 1. validate and normalize input 
         // 2. extract signIn details 
         // 3. validate if user exists or not , if doesnt throw error 
+        // 4. if user exist then check if user email is verified or not 
         // 4. verify password , doesnt match => throw error 
         // 5. generate refresh and access token 
         // 6. store refresh token in db 
         // 7. set secure http cookie 
         // 8. return success response 
-    },
+
+        const result = signIn.safeParse(req.body);
+        if (!result.success) {
+            throw new ApiError(
+                400,
+                "Validation failed",
+                result.error.issues.map((issue) => issue.message)
+            );
+        }
+
+        const { email, password } = result.data;
+
+        const user = await prisma.user.findUnique({
+            where: {
+                email: email,
+            },
+            select: { id: true, emailVerified: true, password: true}
+        })
+
+        if(!user) throw new ApiError(401, "User doesnt exists !!!");
+
+        if(!user?.emailVerified) throw new ApiError(403, "verify your email first !!!");
+        
+        const verifyPass = await bcrypt.compare(password, user.password);
+
+        if(!verifyPass) throw new ApiError(401, "Invalid Password !!!")
+        
+        const { refreshToken, accessToken } = generateTokens(user.id);
+
+        const hashedToken = await bcrypt.hash(refreshToken, 12);
+
+        const updatedUser = await prisma.user.update({
+            where: {
+                id: user.id
+            },
+           data:{
+                refreshToken: hashedToken
+            },
+            select: {id: true, username: true, email: true}
+        })
+
+        const options = {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production"
+        }
+
+        return res
+            .status(200)
+            .cookie("accessToken", accessToken, options)
+            .cookie("refreshToken", refreshToken, options)
+            .json(
+                new ApiResponse(
+                    200,
+                    {
+                        user: updatedUser,
+                    },
+                    "user logged in successfully"
+                )
+            )
+
+    }),
 
     // now these are authenticated controllers 
 
@@ -164,7 +232,7 @@ const user = {
             success: true,
             message: "Email verified successfully",
         });
-    });
+    }),
 }
 
 export default user;
