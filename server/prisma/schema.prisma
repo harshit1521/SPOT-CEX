@@ -9,23 +9,25 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id            Int       @id @default(autoincrement())
-  email         String    @unique
-  username      String    @unique
-  password      String
+  model User {
+    id            Int       @id @default(autoincrement())
+    email         String    @unique
+    username      String    @unique
+    password      String
 
-  emailVerified Boolean   @default(false)
+    emailVerified Boolean   @default(false)
 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+    refreshToken  String?
 
-  balances      Balance[]
-  fills         Fill[]   @relation("userFills")
-  orders        Order[]
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
 
-  emailVerificationTokens EmailVerificationToken[]
-}
+    balances      Balance[]
+    fills         Fill[]   @relation("userFills")
+    orders        Order[]
+
+    emailVerificationTokens EmailVerificationToken[]
+  }
 
 model EmailVerificationToken {
   id        Int      @id @default(autoincrement())
