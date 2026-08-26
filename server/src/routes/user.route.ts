@@ -12,7 +12,9 @@ router
     .route("/signin")
     .post(userController.signIn);
 
-
+router
+    .route("verify-token")
+    .get(userController.verifyEmail)
 // secured routes
 
 router.use(authMiddleware);
