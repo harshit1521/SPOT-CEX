@@ -3,14 +3,14 @@ import { z } from "zod"
 
 const signUp = z.object({
 
-    usesrname: z.string().trim().nonempty("Username is required !!"),
-    email: z.email().trim(),
+    username: z.string().trim().nonempty("Username is required !!"),
+    email: z.email().trim().toLowerCase(),
     password: z.string().min(6)
 })
 
 const signIn = z.object({
 
-    email: z.email().trim(),
+    email: z.email().trim().toLowerCase(),
     password: z.string().min(6)
 })
 
