@@ -1,6 +1,6 @@
 import { Router } from "express";
-import userController from "../controllers/user.controller";
-import authMiddleware from "../middlewares/auth.middleware";
+import userController from "../controllers/user.controller.ts";
+import authMiddleware from "../middlewares/auth.middleware.ts";
 
 const router = Router();
 
@@ -13,7 +13,7 @@ router
     .post(userController.signIn);
 
 router
-    .route("verify-token")
+    .route("/verify-token")
     .get(userController.verifyEmail)
 // secured routes
 
