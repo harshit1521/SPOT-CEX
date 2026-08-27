@@ -12,6 +12,7 @@ import { signUp, signIn, password } from "../schemas/user.schema.ts";
 import { generateVerificationToken } from "../services/emailVerification.ts";
 import { hashVerificationToken, sendVerificationEmail } from "../services/emailVerification.ts";
 import { tr } from "zod/locales";
+import { ref } from "process";
 
 
 const user = {
@@ -162,21 +163,71 @@ const user = {
             )
     }),
 
-    changePassword: () => {
+    changePassword: asyncHandler(async (req: Request, res: Response) => {
 
-        // 1. Authenticate request
-        // 2. Validate and normalize input
-        // 3. Extract currentPassword + newPassword
-        // 4. Fetch authenticated user
-        // 5. Verify current password
-        // 6. Validate new password
-        // 7. Hash new password
-        // 8. Save new password to DB
-        // 9. Revoke existing refresh sessions
-        // 10. Establish a new session / rotate tokens if desired
-        // 11. Set secure cookies
-        // 12. Return success response
-    },
+        const userId = req.user?.id;
+        if(!userId) throw new ApiError(401, "Unauthorized !!!");
+
+        // validate and normalize input 
+        const result = password.safeParse(req.body);
+        if (!result.success) throw new ApiError(
+            400,
+            "Validation failed !!",
+            result.error.issues.map(issue => issue.message)
+        )
+
+        // extract input
+        const { oldPassword, newPassword } = result.data;
+
+        // fetch authenticated user 
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId
+            },
+            select: { id: true, password: true }
+        })
+
+        if(!user) throw new ApiError(401, "Unauthorized !!!");
+
+        // verify current pass 
+        const isPassValid = await bcrypt.compare(oldPassword, user?.password);
+        if (!isPassValid) throw new ApiError(401, "Invalid Password");
+
+        // hash new pass
+        const hashPass = await bcrypt.hash(newPassword, 12);
+
+        // rotate tokens 
+        const { accessToken, refreshToken } = generateTokens(userId!);
+
+        // hash refresh token
+        const hashedToken = await bcrypt.hash(refreshToken, 12);
+
+        // update user data 
+        await prisma.user.update({
+            where: {
+                id: userId,
+            },
+            data: {
+                password: hashPass,
+                refreshToken: hashedToken
+            }
+        })
+
+        const options = {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict" as const
+        }
+
+        // return safe response 
+        return res
+            .status(200)
+            .cookie("accessToken",  accessToken, options)
+            .cookie("refreshToken", refreshToken, options)
+            .json(
+                new ApiResponse(200, "Password updated successfully !!!")
+            )
+    }),
 
     refreshToken: () => {
 
