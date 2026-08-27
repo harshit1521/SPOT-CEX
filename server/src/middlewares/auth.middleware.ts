@@ -26,16 +26,9 @@ const authMiddleware = asyncHandler(
 
         const user = await prisma.user.findUniqueOrThrow({
             where: {
-                id: decodedToken._id,
+                id: parseInt(decodedToken._id),
             },
-            select: {
-                id: true,
-                username: true,
-                email: true,
-                // add the fields you want
-                // password: false,
-                // refreshToken: false,
-            },
+            select: { id: true, username: true, email: true },
         });
 
         if (!user) {
