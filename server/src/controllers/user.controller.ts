@@ -1,34 +1,24 @@
-import type { Response, Request } from "express";
 import bcrypt from "bcrypt";
 import crypto from "crypto"
-import { signUp, signIn, password } from "../schemas/user.schema.ts";
 import jwt from "jsonwebtoken";
+import { prisma } from "../utils/db.ts";
+import { resend } from "../utils/resend.ts";
 import { ApiError } from "../utils/ApiError.ts";
+import type { Response, Request } from "express";
 import { ApiResponse } from "../utils/ApiResponse";
 import { asyncHandler } from "../utils/asyncHandler.ts";
-import { prisma } from "../utils/db.ts";
-import { generateVerificationToken } from "../services/emailVerification.ts";
-import { resend } from "../utils/resend.ts";
-import { hashVerificationToken, sendVerificationEmail } from "../services/emailVerification.ts";
 import { generateTokens } from "../services/tokenService.ts"
-import { setDefaultAutoSelectFamily } from "net";
+import { signUp, signIn, password } from "../schemas/user.schema.ts";
+import { generateVerificationToken } from "../services/emailVerification.ts";
+import { hashVerificationToken, sendVerificationEmail } from "../services/emailVerification.ts";
+import { tr } from "zod/locales";
+
 
 const user = {
 
     signUp: asyncHandler(async (req: Request, res: Response) => {
 
-
-        // 1. validate and normalize input 
-        // 2. receive signup details 
-        // 3. check if user already exists or not , if does then throw error
-        // 5. hash password 
-        // 5. CREATE AN UNVERIFIED USER IN DB 
-        // 6. GENERATE VERIFICATION TOKEN
-        // 7. SEND VERIFICATION EMAIL
-        // 8. RETURN SAFE RESPONSE TO CLIENT
-
-
-        // step 1 done
+        // validate and normalize input 
         const result = signUp.safeParse(req.body);
         if (!result.success) {
             throw new ApiError(
@@ -38,17 +28,17 @@ const user = {
             );
         }
 
-        // step 2 
+        // extract signup details 
         const { username, email, password } = result.data;
 
-        // step 3
+        // validate user 
         const checkUser = await prisma.user.findUnique({ where: { email: email } });
         if (checkUser) throw new ApiError(409, "user already exists !");
 
-        // step 4
+        // hash pass
         const hashPass = await bcrypt.hash(password, 12);
 
-        // step 5 
+        // create user with provided credentials 
         const user = await prisma.user.create({
             data: {
                 username,
@@ -58,26 +48,19 @@ const user = {
             select: { id: true, username: true, email: true, emailVerified: true, createdAt: true }
         })
 
-        const { emailId } = await sendVerificationEmail(user.id, email);
+        // send verification email
+        // const { emailId } = await sendVerificationEmail(user.id, email);
 
+        // return secure response 
         res
             .status(200)
-            .json(new ApiResponse(200,{ emailId } , "User created successfully"))
+            .json(new ApiResponse(200, "User created successfully"))
 
     }),
 
-    signIn: asyncHandler(async ( req: Request, res: Response) => {
+    signIn: asyncHandler(async (req: Request, res: Response) => {
 
-        // 1. validate and normalize input 
-        // 2. extract signIn details 
-        // 3. validate if user exists or not , if doesnt throw error 
-        // 4. if user exist then check if user email is verified or not 
-        // 4. verify password , doesnt match => throw error 
-        // 5. generate refresh and access token 
-        // 6. store refresh token in db 
-        // 7. set secure http cookie 
-        // 8. return success response 
-
+        // validate and normalize input 
         const result = signIn.safeParse(req.body);
         if (!result.success) {
             throw new ApiError(
@@ -87,35 +70,40 @@ const user = {
             );
         }
 
+        // extract signIn details 
         const { email, password } = result.data;
 
+        // validate user 
         const user = await prisma.user.findUnique({
             where: {
                 email: email,
             },
-            select: { id: true, emailVerified: true, password: true}
+            select: { id: true, emailVerified: true, password: true }
         })
 
-        if(!user) throw new ApiError(401, "User doesnt exists !!!");
+        if (!user) throw new ApiError(401, "User doesnt exists !!!");
 
-        if(!user?.emailVerified) throw new ApiError(403, "verify your email first !!!");
-        
+        // if(!user?.emailVerified) throw new ApiError(403, "verify your email first !!!");
+
+        // verify user password 
         const verifyPass = await bcrypt.compare(password, user.password);
+        if (!verifyPass) throw new ApiError(401, "Invalid Password !!!");
 
-        if(!verifyPass) throw new ApiError(401, "Invalid Password !!!")
-        
+        // generate tokens
         const { refreshToken, accessToken } = generateTokens(user.id);
 
+        // hash refresh token 
         const hashedToken = await bcrypt.hash(refreshToken, 12);
 
+        // save hashed refresh token in db
         const updatedUser = await prisma.user.update({
             where: {
                 id: user.id
             },
-           data:{
+            data: {
                 refreshToken: hashedToken
             },
-            select: {id: true, username: true, email: true}
+            select: { id: true, username: true, email: true }
         })
 
         const options = {
@@ -123,6 +111,7 @@ const user = {
             secure: process.env.NODE_ENV === "production"
         }
 
+        // set secure cookie and return success response 
         return res
             .status(200)
             .cookie("accessToken", accessToken, options)
@@ -141,13 +130,37 @@ const user = {
 
     // now these are authenticated controllers 
 
-    logOut: () => {
+    logOut: asyncHandler(async (req: Request, res: Response) => {
 
-        // 1. simply fetch userId from req.user via auth middleware 
-        // 2. revoke current refresh session 
-        // 3. clear access and refresh token 
-        // 4. return success response 
-    },
+        // fetch userId 
+        const userId = req.user?.id;
+
+        // revoke curr refresh token
+        await prisma.user.update({
+
+            where: {
+                id: userId
+            },
+            data: {
+                refreshToken: undefined
+            }
+
+        })
+
+        const options = {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production"
+        }
+
+        // clear tokens and return secure response 
+        return res
+            .status(200)
+            .clearCookie("accessToken", options)
+            .clearCookie("refreshToken", options)
+            .json(
+                new ApiResponse(200, "User logged out")
+            )
+    }),
 
     changePassword: () => {
 
@@ -166,6 +179,7 @@ const user = {
     },
 
     refreshToken: () => {
+
 
     },
 
