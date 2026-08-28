@@ -166,7 +166,7 @@ const user = {
     changePassword: asyncHandler(async (req: Request, res: Response) => {
 
         const userId = req.user?.id;
-        if(!userId) throw new ApiError(401, "Unauthorized !!!");
+        if (!userId) throw new ApiError(401, "Unauthorized !!!");
 
         // validate and normalize input 
         const result = password.safeParse(req.body);
@@ -187,7 +187,7 @@ const user = {
             select: { id: true, password: true }
         })
 
-        if(!user) throw new ApiError(401, "Unauthorized !!!");
+        if (!user) throw new ApiError(401, "Unauthorized !!!");
 
         // verify current pass 
         const isPassValid = await bcrypt.compare(oldPassword, user?.password);
@@ -222,27 +222,31 @@ const user = {
         // return safe response 
         return res
             .status(200)
-            .cookie("accessToken",  accessToken, options)
+            .cookie("accessToken", accessToken, options)
             .cookie("refreshToken", refreshToken, options)
             .json(
                 new ApiResponse(200, "Password updated successfully !!!")
             )
     }),
 
-    refreshToken: () => {
+    refreshToken: asyncHandler(async ( req: Request, res: Response ) => {
 
+        
 
-    },
+    }),
 
-    me: () => {
+    me: asyncHandler(async (req: Request, res: Response) => {
 
-        // 1. authenticate user 
-        // 2. get userId from req.user 
-        // 3. fetch current user 
-        // 4. remove sensitive fields 
-        // 5. return user 
+        const { id, email, username } = req.user!;
 
-    },
+        return res.status(200).json(
+            new ApiResponse(
+                200,
+                { id, email, username },
+                "Fetched user details successfully"
+            )
+        );
+    }),
 
     verifyEmail: asyncHandler(async (req: Request, res: Response) => {
 
