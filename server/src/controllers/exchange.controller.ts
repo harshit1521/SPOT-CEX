@@ -1,99 +1,176 @@
 import type { Request, Response } from "express";
+import type { Asset } from "../../prisma/generated/client.ts";
+import { prisma } from "../utils/db.ts";
+import { ApiError } from "../utils/ApiError.ts";
+import { ApiResponse } from "../utils/ApiResponse.ts";
+import { asyncHandler } from "../utils/asyncHandler.ts";
+import { createOrder, orderIdParam, symbolParam } from "../schemas/exchange.schema.ts";
 import {
-  orderBodySchema,
-  orderIdParamSchema,
-  symbolParamSchema,
-} from "../types/exchange-schema.js";
-import { sendToEngine } from "../utils/engine-client.js";
-import { sendValidationError } from "../utils/validation.js";
+  cancelOrder,
+  getMarketDepth,
+  getOpenOrders,
+  getOrderById,
+  getUserFills,
+  placeOrder,
+} from "../services/engine.service.ts";
 
-function getUserId(req: Request): string {
-  if (!req.userId) throw new Error("Missing authenticated user");
-  return req.userId;
-}
+type BalanceView = {
+  available: string;
+  locked: string;
+};
 
-export async function createOrder(req: Request, res: Response): Promise<void> {
-  const userId = getUserId(req);
+const toBalanceView = (available: { toString(): string }, locked: { toString(): string }): BalanceView => ({
+  available: available.toString(),
+  locked: locked.toString(),
+});
 
-  const parsedBody = orderBodySchema.safeParse(req.body);
-  if (!parsedBody.success) {
-    sendValidationError(res, parsedBody.error);
-    return;
+const getUserBalances = async (userId: number): Promise<Record<Asset, BalanceView>> => {
+  const balances = await prisma.balance.findMany({
+    where: { userId },
+  });
+
+  const result: Partial<Record<Asset, BalanceView>> = {};
+
+  for (const balance of balances) {
+    result[balance.asset] = toBalanceView(balance.available, balance.locked);
   }
 
-  const { type, side, symbol, qty } = parsedBody.data;
-  const price = type === "market" ? null : parsedBody.data.price;
+  return {
+    USD: result.USD ?? { available: "0", locked: "0" },
+    BTC: result.BTC ?? { available: "0", locked: "0" },
+  };
+};
 
-  const engineResponse = await sendToEngine("create_order", {
-    userId,
-    type,
-    side,
-    symbol,
-    price: type === "market" ? null : price,
-    qty,
-  });
+const exchange = {
+  create: asyncHandler(async (req: Request, res: Response) => {
+    const parsed = createOrder.safeParse(req.body);
 
-  res.status(engineResponse.ok ? 200 : 400).json(engineResponse.ok ? engineResponse.data : {
-    error: engineResponse.error,
-  });
-}
+    if (!parsed.success) {
+      throw new ApiError(
+        400,
+        "Validation failed",
+        parsed.error.issues.map((issue) => issue.message)
+      );
+    }
 
-export async function getDepth(req: Request, res: Response): Promise<void> {
-  const parsedParams = symbolParamSchema.safeParse(req.params);
-  if (!parsedParams.success) {
-    sendValidationError(res, parsedParams.error);
-    return;
-  }
+    const userId = req.user!.id;
+    const { side, type, symbol, price, qty } = parsed.data;
 
-  const { symbol } = parsedParams.data;
-  const engineResponse = await sendToEngine("get_depth", { symbol });
-  res.status(engineResponse.ok ? 200 : 400).json(engineResponse.ok ? engineResponse.data : {
-    error: engineResponse.error,
-  });
-}
+    const result = await placeOrder(userId, {
+      side,
+      type,
+      symbol,
+      price: type === "LIMIT" ? price ?? null : null,
+      qty,
+    });
 
-export async function getBalance(req: Request, res: Response): Promise<void> {
-  const engineResponse = await sendToEngine("get_user_balance", {
-    userId: getUserId(req),
-  });
+    return res.status(200).json(
+      new ApiResponse(200, result, "Order placed successfully")
+    );
+  }),
 
-  res.status(engineResponse.ok ? 200 : 400).json(engineResponse.ok ? engineResponse.data : {
-    error: engineResponse.error,
-  });
-}
+  order: asyncHandler(async (req: Request, res: Response) => {
+    const parsed = orderIdParam.safeParse(req.params);
 
-export async function getOrder(req: Request, res: Response): Promise<void> {
-  const parsedParams = orderIdParamSchema.safeParse(req.params);
-  if (!parsedParams.success) {
-    sendValidationError(res, parsedParams.error);
-    return;
-  }
+    if (!parsed.success) {
+      throw new ApiError(
+        400,
+        "Validation failed",
+        parsed.error.issues.map((issue) => issue.message)
+      );
+    }
 
-  const { orderId } = parsedParams.data;
-  const engineResponse = await sendToEngine("get_order", {
-    userId: getUserId(req),
-    orderId,
-  });
+    const order = await getOrderById(req.user!.id, parsed.data.orderId);
 
-  res.status(engineResponse.ok ? 200 : 404).json(engineResponse.ok ? engineResponse.data : {
-    error: engineResponse.error,
-  });
-}
+    return res.status(200).json(
+      new ApiResponse(200, order, "Order fetched successfully")
+    );
+  }),
 
-export async function cancelOrder(req: Request, res: Response): Promise<void> {
-  const parsedParams = orderIdParamSchema.safeParse(req.params);
-  if (!parsedParams.success) {
-    sendValidationError(res, parsedParams.error);
-    return;
-  }
+  close: asyncHandler(async (req: Request, res: Response) => {
+    const parsed = orderIdParam.safeParse(req.params);
 
-  const { orderId } = parsedParams.data;
-  const engineResponse = await sendToEngine("cancel_order", {
-    userId: getUserId(req),
-    orderId,
-  });
+    if (!parsed.success) {
+      throw new ApiError(
+        400,
+        "Validation failed",
+        parsed.error.issues.map((issue) => issue.message)
+      );
+    }
 
-  res.status(engineResponse.ok ? 200 : 400).json(engineResponse.ok ? engineResponse.data : {
-    error: engineResponse.error,
-  });
-}
+    const order = await cancelOrder(req.user!.id, parsed.data.orderId);
+
+    return res.status(200).json(
+      new ApiResponse(200, order, "Order cancelled successfully")
+    );
+  }),
+
+  balance: asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user!.id;
+    const balances = await getUserBalances(userId);
+
+    return res.status(200).json(
+      new ApiResponse(200, balances, "Balances fetched successfully")
+    );
+  }),
+
+  usd: asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user!.id;
+    const balance = await prisma.balance.findUnique({
+      where: {
+        userId_asset: {
+          userId,
+          asset: "USD",
+        },
+      },
+    });
+
+    if (!balance) {
+      throw new ApiError(404, "USD balance not found");
+    }
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        toBalanceView(balance.available, balance.locked),
+        "USD balance fetched successfully"
+      )
+    );
+  }),
+
+  open: asyncHandler(async (req: Request, res: Response) => {
+    const orders = await getOpenOrders(req.user!.id);
+
+    return res.status(200).json(
+      new ApiResponse(200, orders, "Open orders fetched successfully")
+    );
+  }),
+
+  depth: asyncHandler(async (req: Request, res: Response) => {
+    const parsed = symbolParam.safeParse(req.params);
+
+    if (!parsed.success) {
+      throw new ApiError(
+        400,
+        "Validation failed",
+        parsed.error.issues.map((issue) => issue.message)
+      );
+    }
+
+    const depth = await getMarketDepth(parsed.data.symbol);
+
+    return res.status(200).json(
+      new ApiResponse(200, depth, "Depth fetched successfully")
+    );
+  }),
+
+  fills: asyncHandler(async (req: Request, res: Response) => {
+    const fills = await getUserFills(req.user!.id);
+
+    return res.status(200).json(
+      new ApiResponse(200, fills, "Fills fetched successfully")
+    );
+  }),
+};
+
+export default exchange;
