@@ -9,6 +9,14 @@
 * 🟢 You can import this file directly.
 */
 
+export const Asset = {
+  USD: 'USD',
+  BTC: 'BTC'
+} as const
+
+export type Asset = (typeof Asset)[keyof typeof Asset]
+
+
 export const Side = {
   BUY: 'BUY',
   SELL: 'SELL'

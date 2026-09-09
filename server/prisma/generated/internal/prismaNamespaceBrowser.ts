@@ -53,7 +53,6 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   EmailVerificationToken: 'EmailVerificationToken',
-  Market: 'Market',
   Order: 'Order',
   Fill: 'Fill',
   Balance: 'Balance'
@@ -101,22 +100,10 @@ export const EmailVerificationTokenScalarFieldEnum = {
 export type EmailVerificationTokenScalarFieldEnum = (typeof EmailVerificationTokenScalarFieldEnum)[keyof typeof EmailVerificationTokenScalarFieldEnum]
 
 
-export const MarketScalarFieldEnum = {
-  id: 'id',
-  symbol: 'symbol',
-  name: 'name',
-  baseAsset: 'baseAsset',
-  quoteAsset: 'quoteAsset',
-  createdAt: 'createdAt'
-} as const
-
-export type MarketScalarFieldEnum = (typeof MarketScalarFieldEnum)[keyof typeof MarketScalarFieldEnum]
-
-
 export const OrderScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  marketId: 'marketId',
+  symbol: 'symbol',
   side: 'side',
   orderType: 'orderType',
   price: 'price',
@@ -132,7 +119,7 @@ export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof Or
 
 export const FillScalarFieldEnum = {
   id: 'id',
-  marketId: 'marketId',
+  symbol: 'symbol',
   price: 'price',
   quantity: 'quantity',
   buyOrderId: 'buyOrderId',
@@ -147,7 +134,7 @@ export type FillScalarFieldEnum = (typeof FillScalarFieldEnum)[keyof typeof Fill
 export const BalanceScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  currency: 'currency',
+  asset: 'asset',
   available: 'available',
   locked: 'locked',
   updatedAt: 'updatedAt'

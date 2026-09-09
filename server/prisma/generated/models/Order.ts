@@ -29,7 +29,6 @@ export type AggregateOrder = {
 export type OrderAvgAggregateOutputType = {
   id: number | null
   userId: number | null
-  marketId: number | null
   price: runtime.Decimal | null
   quantity: runtime.Decimal | null
   filledQty: runtime.Decimal | null
@@ -38,7 +37,6 @@ export type OrderAvgAggregateOutputType = {
 export type OrderSumAggregateOutputType = {
   id: bigint | null
   userId: number | null
-  marketId: number | null
   price: runtime.Decimal | null
   quantity: runtime.Decimal | null
   filledQty: runtime.Decimal | null
@@ -47,7 +45,7 @@ export type OrderSumAggregateOutputType = {
 export type OrderMinAggregateOutputType = {
   id: bigint | null
   userId: number | null
-  marketId: number | null
+  symbol: string | null
   side: $Enums.Side | null
   orderType: $Enums.OrderType | null
   price: runtime.Decimal | null
@@ -61,7 +59,7 @@ export type OrderMinAggregateOutputType = {
 export type OrderMaxAggregateOutputType = {
   id: bigint | null
   userId: number | null
-  marketId: number | null
+  symbol: string | null
   side: $Enums.Side | null
   orderType: $Enums.OrderType | null
   price: runtime.Decimal | null
@@ -75,7 +73,7 @@ export type OrderMaxAggregateOutputType = {
 export type OrderCountAggregateOutputType = {
   id: number
   userId: number
-  marketId: number
+  symbol: number
   side: number
   orderType: number
   price: number
@@ -91,7 +89,6 @@ export type OrderCountAggregateOutputType = {
 export type OrderAvgAggregateInputType = {
   id?: true
   userId?: true
-  marketId?: true
   price?: true
   quantity?: true
   filledQty?: true
@@ -100,7 +97,6 @@ export type OrderAvgAggregateInputType = {
 export type OrderSumAggregateInputType = {
   id?: true
   userId?: true
-  marketId?: true
   price?: true
   quantity?: true
   filledQty?: true
@@ -109,7 +105,7 @@ export type OrderSumAggregateInputType = {
 export type OrderMinAggregateInputType = {
   id?: true
   userId?: true
-  marketId?: true
+  symbol?: true
   side?: true
   orderType?: true
   price?: true
@@ -123,7 +119,7 @@ export type OrderMinAggregateInputType = {
 export type OrderMaxAggregateInputType = {
   id?: true
   userId?: true
-  marketId?: true
+  symbol?: true
   side?: true
   orderType?: true
   price?: true
@@ -137,7 +133,7 @@ export type OrderMaxAggregateInputType = {
 export type OrderCountAggregateInputType = {
   id?: true
   userId?: true
-  marketId?: true
+  symbol?: true
   side?: true
   orderType?: true
   price?: true
@@ -238,7 +234,7 @@ export type OrderGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type OrderGroupByOutputType = {
   id: bigint
   userId: number
-  marketId: number
+  symbol: string
   side: $Enums.Side
   orderType: $Enums.OrderType
   price: runtime.Decimal | null
@@ -275,7 +271,7 @@ export type OrderWhereInput = {
   NOT?: Prisma.OrderWhereInput | Prisma.OrderWhereInput[]
   id?: Prisma.BigIntFilter<"Order"> | bigint | number
   userId?: Prisma.IntFilter<"Order"> | number
-  marketId?: Prisma.IntFilter<"Order"> | number
+  symbol?: Prisma.StringFilter<"Order"> | string
   side?: Prisma.EnumSideFilter<"Order"> | $Enums.Side
   orderType?: Prisma.EnumOrderTypeFilter<"Order"> | $Enums.OrderType
   price?: Prisma.DecimalNullableFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -286,14 +282,13 @@ export type OrderWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   buyFills?: Prisma.FillListRelationFilter
   sellFills?: Prisma.FillListRelationFilter
-  market?: Prisma.XOR<Prisma.MarketScalarRelationFilter, Prisma.MarketWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type OrderOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  marketId?: Prisma.SortOrder
+  symbol?: Prisma.SortOrder
   side?: Prisma.SortOrder
   orderType?: Prisma.SortOrder
   price?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -304,7 +299,6 @@ export type OrderOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   buyFills?: Prisma.FillOrderByRelationAggregateInput
   sellFills?: Prisma.FillOrderByRelationAggregateInput
-  market?: Prisma.MarketOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -314,7 +308,7 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.OrderWhereInput[]
   NOT?: Prisma.OrderWhereInput | Prisma.OrderWhereInput[]
   userId?: Prisma.IntFilter<"Order"> | number
-  marketId?: Prisma.IntFilter<"Order"> | number
+  symbol?: Prisma.StringFilter<"Order"> | string
   side?: Prisma.EnumSideFilter<"Order"> | $Enums.Side
   orderType?: Prisma.EnumOrderTypeFilter<"Order"> | $Enums.OrderType
   price?: Prisma.DecimalNullableFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -325,14 +319,13 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   buyFills?: Prisma.FillListRelationFilter
   sellFills?: Prisma.FillListRelationFilter
-  market?: Prisma.XOR<Prisma.MarketScalarRelationFilter, Prisma.MarketWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
 export type OrderOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  marketId?: Prisma.SortOrder
+  symbol?: Prisma.SortOrder
   side?: Prisma.SortOrder
   orderType?: Prisma.SortOrder
   price?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -354,7 +347,7 @@ export type OrderScalarWhereWithAggregatesInput = {
   NOT?: Prisma.OrderScalarWhereWithAggregatesInput | Prisma.OrderScalarWhereWithAggregatesInput[]
   id?: Prisma.BigIntWithAggregatesFilter<"Order"> | bigint | number
   userId?: Prisma.IntWithAggregatesFilter<"Order"> | number
-  marketId?: Prisma.IntWithAggregatesFilter<"Order"> | number
+  symbol?: Prisma.StringWithAggregatesFilter<"Order"> | string
   side?: Prisma.EnumSideWithAggregatesFilter<"Order"> | $Enums.Side
   orderType?: Prisma.EnumOrderTypeWithAggregatesFilter<"Order"> | $Enums.OrderType
   price?: Prisma.DecimalNullableWithAggregatesFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -367,6 +360,7 @@ export type OrderScalarWhereWithAggregatesInput = {
 
 export type OrderCreateInput = {
   id?: bigint | number
+  symbol: string
   side: $Enums.Side
   orderType: $Enums.OrderType
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -377,14 +371,13 @@ export type OrderCreateInput = {
   updatedAt?: Date | string
   buyFills?: Prisma.FillCreateNestedManyWithoutBuyOrderInput
   sellFills?: Prisma.FillCreateNestedManyWithoutSellOrderInput
-  market: Prisma.MarketCreateNestedOneWithoutOrdersInput
   user: Prisma.UserCreateNestedOneWithoutOrdersInput
 }
 
 export type OrderUncheckedCreateInput = {
   id?: bigint | number
   userId: number
-  marketId: number
+  symbol: string
   side: $Enums.Side
   orderType: $Enums.OrderType
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -399,6 +392,7 @@ export type OrderUncheckedCreateInput = {
 
 export type OrderUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  symbol?: Prisma.StringFieldUpdateOperationsInput | string
   side?: Prisma.EnumSideFieldUpdateOperationsInput | $Enums.Side
   orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
   price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -409,14 +403,13 @@ export type OrderUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   buyFills?: Prisma.FillUpdateManyWithoutBuyOrderNestedInput
   sellFills?: Prisma.FillUpdateManyWithoutSellOrderNestedInput
-  market?: Prisma.MarketUpdateOneRequiredWithoutOrdersNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
 }
 
 export type OrderUncheckedUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   userId?: Prisma.IntFieldUpdateOperationsInput | number
-  marketId?: Prisma.IntFieldUpdateOperationsInput | number
+  symbol?: Prisma.StringFieldUpdateOperationsInput | string
   side?: Prisma.EnumSideFieldUpdateOperationsInput | $Enums.Side
   orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
   price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -432,7 +425,7 @@ export type OrderUncheckedUpdateInput = {
 export type OrderCreateManyInput = {
   id?: bigint | number
   userId: number
-  marketId: number
+  symbol: string
   side: $Enums.Side
   orderType: $Enums.OrderType
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -445,6 +438,7 @@ export type OrderCreateManyInput = {
 
 export type OrderUpdateManyMutationInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  symbol?: Prisma.StringFieldUpdateOperationsInput | string
   side?: Prisma.EnumSideFieldUpdateOperationsInput | $Enums.Side
   orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
   price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -458,7 +452,7 @@ export type OrderUpdateManyMutationInput = {
 export type OrderUncheckedUpdateManyInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   userId?: Prisma.IntFieldUpdateOperationsInput | number
-  marketId?: Prisma.IntFieldUpdateOperationsInput | number
+  symbol?: Prisma.StringFieldUpdateOperationsInput | string
   side?: Prisma.EnumSideFieldUpdateOperationsInput | $Enums.Side
   orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
   price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -482,7 +476,7 @@ export type OrderOrderByRelationAggregateInput = {
 export type OrderCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  marketId?: Prisma.SortOrder
+  symbol?: Prisma.SortOrder
   side?: Prisma.SortOrder
   orderType?: Prisma.SortOrder
   price?: Prisma.SortOrder
@@ -496,7 +490,6 @@ export type OrderCountOrderByAggregateInput = {
 export type OrderAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  marketId?: Prisma.SortOrder
   price?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   filledQty?: Prisma.SortOrder
@@ -505,7 +498,7 @@ export type OrderAvgOrderByAggregateInput = {
 export type OrderMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  marketId?: Prisma.SortOrder
+  symbol?: Prisma.SortOrder
   side?: Prisma.SortOrder
   orderType?: Prisma.SortOrder
   price?: Prisma.SortOrder
@@ -519,7 +512,7 @@ export type OrderMaxOrderByAggregateInput = {
 export type OrderMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  marketId?: Prisma.SortOrder
+  symbol?: Prisma.SortOrder
   side?: Prisma.SortOrder
   orderType?: Prisma.SortOrder
   price?: Prisma.SortOrder
@@ -533,7 +526,6 @@ export type OrderMinOrderByAggregateInput = {
 export type OrderSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  marketId?: Prisma.SortOrder
   price?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   filledQty?: Prisma.SortOrder
@@ -583,48 +575,6 @@ export type OrderUncheckedUpdateManyWithoutUserNestedInput = {
   connect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
   update?: Prisma.OrderUpdateWithWhereUniqueWithoutUserInput | Prisma.OrderUpdateWithWhereUniqueWithoutUserInput[]
   updateMany?: Prisma.OrderUpdateManyWithWhereWithoutUserInput | Prisma.OrderUpdateManyWithWhereWithoutUserInput[]
-  deleteMany?: Prisma.OrderScalarWhereInput | Prisma.OrderScalarWhereInput[]
-}
-
-export type OrderCreateNestedManyWithoutMarketInput = {
-  create?: Prisma.XOR<Prisma.OrderCreateWithoutMarketInput, Prisma.OrderUncheckedCreateWithoutMarketInput> | Prisma.OrderCreateWithoutMarketInput[] | Prisma.OrderUncheckedCreateWithoutMarketInput[]
-  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutMarketInput | Prisma.OrderCreateOrConnectWithoutMarketInput[]
-  createMany?: Prisma.OrderCreateManyMarketInputEnvelope
-  connect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
-}
-
-export type OrderUncheckedCreateNestedManyWithoutMarketInput = {
-  create?: Prisma.XOR<Prisma.OrderCreateWithoutMarketInput, Prisma.OrderUncheckedCreateWithoutMarketInput> | Prisma.OrderCreateWithoutMarketInput[] | Prisma.OrderUncheckedCreateWithoutMarketInput[]
-  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutMarketInput | Prisma.OrderCreateOrConnectWithoutMarketInput[]
-  createMany?: Prisma.OrderCreateManyMarketInputEnvelope
-  connect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
-}
-
-export type OrderUpdateManyWithoutMarketNestedInput = {
-  create?: Prisma.XOR<Prisma.OrderCreateWithoutMarketInput, Prisma.OrderUncheckedCreateWithoutMarketInput> | Prisma.OrderCreateWithoutMarketInput[] | Prisma.OrderUncheckedCreateWithoutMarketInput[]
-  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutMarketInput | Prisma.OrderCreateOrConnectWithoutMarketInput[]
-  upsert?: Prisma.OrderUpsertWithWhereUniqueWithoutMarketInput | Prisma.OrderUpsertWithWhereUniqueWithoutMarketInput[]
-  createMany?: Prisma.OrderCreateManyMarketInputEnvelope
-  set?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
-  disconnect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
-  delete?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
-  connect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
-  update?: Prisma.OrderUpdateWithWhereUniqueWithoutMarketInput | Prisma.OrderUpdateWithWhereUniqueWithoutMarketInput[]
-  updateMany?: Prisma.OrderUpdateManyWithWhereWithoutMarketInput | Prisma.OrderUpdateManyWithWhereWithoutMarketInput[]
-  deleteMany?: Prisma.OrderScalarWhereInput | Prisma.OrderScalarWhereInput[]
-}
-
-export type OrderUncheckedUpdateManyWithoutMarketNestedInput = {
-  create?: Prisma.XOR<Prisma.OrderCreateWithoutMarketInput, Prisma.OrderUncheckedCreateWithoutMarketInput> | Prisma.OrderCreateWithoutMarketInput[] | Prisma.OrderUncheckedCreateWithoutMarketInput[]
-  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutMarketInput | Prisma.OrderCreateOrConnectWithoutMarketInput[]
-  upsert?: Prisma.OrderUpsertWithWhereUniqueWithoutMarketInput | Prisma.OrderUpsertWithWhereUniqueWithoutMarketInput[]
-  createMany?: Prisma.OrderCreateManyMarketInputEnvelope
-  set?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
-  disconnect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
-  delete?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
-  connect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
-  update?: Prisma.OrderUpdateWithWhereUniqueWithoutMarketInput | Prisma.OrderUpdateWithWhereUniqueWithoutMarketInput[]
-  updateMany?: Prisma.OrderUpdateManyWithWhereWithoutMarketInput | Prisma.OrderUpdateManyWithWhereWithoutMarketInput[]
   deleteMany?: Prisma.OrderScalarWhereInput | Prisma.OrderScalarWhereInput[]
 }
 
@@ -698,6 +648,7 @@ export type OrderUpdateOneWithoutSellFillsNestedInput = {
 
 export type OrderCreateWithoutUserInput = {
   id?: bigint | number
+  symbol: string
   side: $Enums.Side
   orderType: $Enums.OrderType
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -708,12 +659,11 @@ export type OrderCreateWithoutUserInput = {
   updatedAt?: Date | string
   buyFills?: Prisma.FillCreateNestedManyWithoutBuyOrderInput
   sellFills?: Prisma.FillCreateNestedManyWithoutSellOrderInput
-  market: Prisma.MarketCreateNestedOneWithoutOrdersInput
 }
 
 export type OrderUncheckedCreateWithoutUserInput = {
   id?: bigint | number
-  marketId: number
+  symbol: string
   side: $Enums.Side
   orderType: $Enums.OrderType
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -758,7 +708,7 @@ export type OrderScalarWhereInput = {
   NOT?: Prisma.OrderScalarWhereInput | Prisma.OrderScalarWhereInput[]
   id?: Prisma.BigIntFilter<"Order"> | bigint | number
   userId?: Prisma.IntFilter<"Order"> | number
-  marketId?: Prisma.IntFilter<"Order"> | number
+  symbol?: Prisma.StringFilter<"Order"> | string
   side?: Prisma.EnumSideFilter<"Order"> | $Enums.Side
   orderType?: Prisma.EnumOrderTypeFilter<"Order"> | $Enums.OrderType
   price?: Prisma.DecimalNullableFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -769,64 +719,9 @@ export type OrderScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
 }
 
-export type OrderCreateWithoutMarketInput = {
-  id?: bigint | number
-  side: $Enums.Side
-  orderType: $Enums.OrderType
-  price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
-  filledQty?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  status?: $Enums.OrderStatus
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  buyFills?: Prisma.FillCreateNestedManyWithoutBuyOrderInput
-  sellFills?: Prisma.FillCreateNestedManyWithoutSellOrderInput
-  user: Prisma.UserCreateNestedOneWithoutOrdersInput
-}
-
-export type OrderUncheckedCreateWithoutMarketInput = {
-  id?: bigint | number
-  userId: number
-  side: $Enums.Side
-  orderType: $Enums.OrderType
-  price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
-  filledQty?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  status?: $Enums.OrderStatus
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  buyFills?: Prisma.FillUncheckedCreateNestedManyWithoutBuyOrderInput
-  sellFills?: Prisma.FillUncheckedCreateNestedManyWithoutSellOrderInput
-}
-
-export type OrderCreateOrConnectWithoutMarketInput = {
-  where: Prisma.OrderWhereUniqueInput
-  create: Prisma.XOR<Prisma.OrderCreateWithoutMarketInput, Prisma.OrderUncheckedCreateWithoutMarketInput>
-}
-
-export type OrderCreateManyMarketInputEnvelope = {
-  data: Prisma.OrderCreateManyMarketInput | Prisma.OrderCreateManyMarketInput[]
-  skipDuplicates?: boolean
-}
-
-export type OrderUpsertWithWhereUniqueWithoutMarketInput = {
-  where: Prisma.OrderWhereUniqueInput
-  update: Prisma.XOR<Prisma.OrderUpdateWithoutMarketInput, Prisma.OrderUncheckedUpdateWithoutMarketInput>
-  create: Prisma.XOR<Prisma.OrderCreateWithoutMarketInput, Prisma.OrderUncheckedCreateWithoutMarketInput>
-}
-
-export type OrderUpdateWithWhereUniqueWithoutMarketInput = {
-  where: Prisma.OrderWhereUniqueInput
-  data: Prisma.XOR<Prisma.OrderUpdateWithoutMarketInput, Prisma.OrderUncheckedUpdateWithoutMarketInput>
-}
-
-export type OrderUpdateManyWithWhereWithoutMarketInput = {
-  where: Prisma.OrderScalarWhereInput
-  data: Prisma.XOR<Prisma.OrderUpdateManyMutationInput, Prisma.OrderUncheckedUpdateManyWithoutMarketInput>
-}
-
 export type OrderCreateWithoutBuyFillsInput = {
   id?: bigint | number
+  symbol: string
   side: $Enums.Side
   orderType: $Enums.OrderType
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -836,14 +731,13 @@ export type OrderCreateWithoutBuyFillsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   sellFills?: Prisma.FillCreateNestedManyWithoutSellOrderInput
-  market: Prisma.MarketCreateNestedOneWithoutOrdersInput
   user: Prisma.UserCreateNestedOneWithoutOrdersInput
 }
 
 export type OrderUncheckedCreateWithoutBuyFillsInput = {
   id?: bigint | number
   userId: number
-  marketId: number
+  symbol: string
   side: $Enums.Side
   orderType: $Enums.OrderType
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -862,6 +756,7 @@ export type OrderCreateOrConnectWithoutBuyFillsInput = {
 
 export type OrderCreateWithoutSellFillsInput = {
   id?: bigint | number
+  symbol: string
   side: $Enums.Side
   orderType: $Enums.OrderType
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -871,14 +766,13 @@ export type OrderCreateWithoutSellFillsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   buyFills?: Prisma.FillCreateNestedManyWithoutBuyOrderInput
-  market: Prisma.MarketCreateNestedOneWithoutOrdersInput
   user: Prisma.UserCreateNestedOneWithoutOrdersInput
 }
 
 export type OrderUncheckedCreateWithoutSellFillsInput = {
   id?: bigint | number
   userId: number
-  marketId: number
+  symbol: string
   side: $Enums.Side
   orderType: $Enums.OrderType
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -908,6 +802,7 @@ export type OrderUpdateToOneWithWhereWithoutBuyFillsInput = {
 
 export type OrderUpdateWithoutBuyFillsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  symbol?: Prisma.StringFieldUpdateOperationsInput | string
   side?: Prisma.EnumSideFieldUpdateOperationsInput | $Enums.Side
   orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
   price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -917,14 +812,13 @@ export type OrderUpdateWithoutBuyFillsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sellFills?: Prisma.FillUpdateManyWithoutSellOrderNestedInput
-  market?: Prisma.MarketUpdateOneRequiredWithoutOrdersNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutBuyFillsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   userId?: Prisma.IntFieldUpdateOperationsInput | number
-  marketId?: Prisma.IntFieldUpdateOperationsInput | number
+  symbol?: Prisma.StringFieldUpdateOperationsInput | string
   side?: Prisma.EnumSideFieldUpdateOperationsInput | $Enums.Side
   orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
   price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -949,6 +843,7 @@ export type OrderUpdateToOneWithWhereWithoutSellFillsInput = {
 
 export type OrderUpdateWithoutSellFillsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  symbol?: Prisma.StringFieldUpdateOperationsInput | string
   side?: Prisma.EnumSideFieldUpdateOperationsInput | $Enums.Side
   orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
   price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -958,14 +853,13 @@ export type OrderUpdateWithoutSellFillsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   buyFills?: Prisma.FillUpdateManyWithoutBuyOrderNestedInput
-  market?: Prisma.MarketUpdateOneRequiredWithoutOrdersNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutSellFillsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   userId?: Prisma.IntFieldUpdateOperationsInput | number
-  marketId?: Prisma.IntFieldUpdateOperationsInput | number
+  symbol?: Prisma.StringFieldUpdateOperationsInput | string
   side?: Prisma.EnumSideFieldUpdateOperationsInput | $Enums.Side
   orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
   price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -979,7 +873,7 @@ export type OrderUncheckedUpdateWithoutSellFillsInput = {
 
 export type OrderCreateManyUserInput = {
   id?: bigint | number
-  marketId: number
+  symbol: string
   side: $Enums.Side
   orderType: $Enums.OrderType
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -992,6 +886,7 @@ export type OrderCreateManyUserInput = {
 
 export type OrderUpdateWithoutUserInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  symbol?: Prisma.StringFieldUpdateOperationsInput | string
   side?: Prisma.EnumSideFieldUpdateOperationsInput | $Enums.Side
   orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
   price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1002,12 +897,11 @@ export type OrderUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   buyFills?: Prisma.FillUpdateManyWithoutBuyOrderNestedInput
   sellFills?: Prisma.FillUpdateManyWithoutSellOrderNestedInput
-  market?: Prisma.MarketUpdateOneRequiredWithoutOrdersNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutUserInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  marketId?: Prisma.IntFieldUpdateOperationsInput | number
+  symbol?: Prisma.StringFieldUpdateOperationsInput | string
   side?: Prisma.EnumSideFieldUpdateOperationsInput | $Enums.Side
   orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
   price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1022,63 +916,7 @@ export type OrderUncheckedUpdateWithoutUserInput = {
 
 export type OrderUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  marketId?: Prisma.IntFieldUpdateOperationsInput | number
-  side?: Prisma.EnumSideFieldUpdateOperationsInput | $Enums.Side
-  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
-  price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  filledQty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type OrderCreateManyMarketInput = {
-  id?: bigint | number
-  userId: number
-  side: $Enums.Side
-  orderType: $Enums.OrderType
-  price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
-  filledQty?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  status?: $Enums.OrderStatus
-  createdAt?: Date | string
-  updatedAt?: Date | string
-}
-
-export type OrderUpdateWithoutMarketInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  side?: Prisma.EnumSideFieldUpdateOperationsInput | $Enums.Side
-  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
-  price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  filledQty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  buyFills?: Prisma.FillUpdateManyWithoutBuyOrderNestedInput
-  sellFills?: Prisma.FillUpdateManyWithoutSellOrderNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
-}
-
-export type OrderUncheckedUpdateWithoutMarketInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  userId?: Prisma.IntFieldUpdateOperationsInput | number
-  side?: Prisma.EnumSideFieldUpdateOperationsInput | $Enums.Side
-  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
-  price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  filledQty?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  buyFills?: Prisma.FillUncheckedUpdateManyWithoutBuyOrderNestedInput
-  sellFills?: Prisma.FillUncheckedUpdateManyWithoutSellOrderNestedInput
-}
-
-export type OrderUncheckedUpdateManyWithoutMarketInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  userId?: Prisma.IntFieldUpdateOperationsInput | number
+  symbol?: Prisma.StringFieldUpdateOperationsInput | string
   side?: Prisma.EnumSideFieldUpdateOperationsInput | $Enums.Side
   orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
   price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1132,7 +970,7 @@ export type OrderCountOutputTypeCountSellFillsArgs<ExtArgs extends runtime.Types
 export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  marketId?: boolean
+  symbol?: boolean
   side?: boolean
   orderType?: boolean
   price?: boolean
@@ -1143,7 +981,6 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   updatedAt?: boolean
   buyFills?: boolean | Prisma.Order$buyFillsArgs<ExtArgs>
   sellFills?: boolean | Prisma.Order$sellFillsArgs<ExtArgs>
-  market?: boolean | Prisma.MarketDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.OrderCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["order"]>
@@ -1151,7 +988,7 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  marketId?: boolean
+  symbol?: boolean
   side?: boolean
   orderType?: boolean
   price?: boolean
@@ -1160,14 +997,13 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  market?: boolean | Prisma.MarketDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["order"]>
 
 export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  marketId?: boolean
+  symbol?: boolean
   side?: boolean
   orderType?: boolean
   price?: boolean
@@ -1176,14 +1012,13 @@ export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  market?: boolean | Prisma.MarketDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["order"]>
 
 export type OrderSelectScalar = {
   id?: boolean
   userId?: boolean
-  marketId?: boolean
+  symbol?: boolean
   side?: boolean
   orderType?: boolean
   price?: boolean
@@ -1194,20 +1029,17 @@ export type OrderSelectScalar = {
   updatedAt?: boolean
 }
 
-export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "marketId" | "side" | "orderType" | "price" | "quantity" | "filledQty" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
+export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "symbol" | "side" | "orderType" | "price" | "quantity" | "filledQty" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
 export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   buyFills?: boolean | Prisma.Order$buyFillsArgs<ExtArgs>
   sellFills?: boolean | Prisma.Order$sellFillsArgs<ExtArgs>
-  market?: boolean | Prisma.MarketDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.OrderCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type OrderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  market?: boolean | Prisma.MarketDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type OrderIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  market?: boolean | Prisma.MarketDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
@@ -1216,13 +1048,12 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   objects: {
     buyFills: Prisma.$FillPayload<ExtArgs>[]
     sellFills: Prisma.$FillPayload<ExtArgs>[]
-    market: Prisma.$MarketPayload<ExtArgs>
     user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: bigint
     userId: number
-    marketId: number
+    symbol: string
     side: $Enums.Side
     orderType: $Enums.OrderType
     price: runtime.Decimal | null
@@ -1627,7 +1458,6 @@ export interface Prisma__OrderClient<T, Null = never, ExtArgs extends runtime.Ty
   readonly [Symbol.toStringTag]: "PrismaPromise"
   buyFills<T extends Prisma.Order$buyFillsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$buyFillsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FillPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sellFills<T extends Prisma.Order$sellFillsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$sellFillsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FillPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  market<T extends Prisma.MarketDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MarketDefaultArgs<ExtArgs>>): Prisma.Prisma__MarketClient<runtime.Types.Result.GetResult<Prisma.$MarketPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1660,7 +1490,7 @@ export interface Prisma__OrderClient<T, Null = never, ExtArgs extends runtime.Ty
 export interface OrderFieldRefs {
   readonly id: Prisma.FieldRef<"Order", 'BigInt'>
   readonly userId: Prisma.FieldRef<"Order", 'Int'>
-  readonly marketId: Prisma.FieldRef<"Order", 'Int'>
+  readonly symbol: Prisma.FieldRef<"Order", 'String'>
   readonly side: Prisma.FieldRef<"Order", 'Side'>
   readonly orderType: Prisma.FieldRef<"Order", 'OrderType'>
   readonly price: Prisma.FieldRef<"Order", 'Decimal'>

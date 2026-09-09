@@ -399,7 +399,6 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   User: 'User',
   EmailVerificationToken: 'EmailVerificationToken',
-  Market: 'Market',
   Order: 'Order',
   Fill: 'Fill',
   Balance: 'Balance'
@@ -418,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "emailVerificationToken" | "market" | "order" | "fill" | "balance"
+    modelProps: "user" | "emailVerificationToken" | "order" | "fill" | "balance"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -567,80 +566,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.EmailVerificationTokenCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.EmailVerificationTokenCountAggregateOutputType> | number
-        }
-      }
-    }
-    Market: {
-      payload: Prisma.$MarketPayload<ExtArgs>
-      fields: Prisma.MarketFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.MarketFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.MarketFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketPayload>
-        }
-        findFirst: {
-          args: Prisma.MarketFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.MarketFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketPayload>
-        }
-        findMany: {
-          args: Prisma.MarketFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketPayload>[]
-        }
-        create: {
-          args: Prisma.MarketCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketPayload>
-        }
-        createMany: {
-          args: Prisma.MarketCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.MarketCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketPayload>[]
-        }
-        delete: {
-          args: Prisma.MarketDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketPayload>
-        }
-        update: {
-          args: Prisma.MarketUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketPayload>
-        }
-        deleteMany: {
-          args: Prisma.MarketDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.MarketUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.MarketUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketPayload>[]
-        }
-        upsert: {
-          args: Prisma.MarketUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketPayload>
-        }
-        aggregate: {
-          args: Prisma.MarketAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateMarket>
-        }
-        groupBy: {
-          args: Prisma.MarketGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.MarketGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.MarketCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.MarketCountAggregateOutputType> | number
         }
       }
     }
@@ -931,22 +856,10 @@ export const EmailVerificationTokenScalarFieldEnum = {
 export type EmailVerificationTokenScalarFieldEnum = (typeof EmailVerificationTokenScalarFieldEnum)[keyof typeof EmailVerificationTokenScalarFieldEnum]
 
 
-export const MarketScalarFieldEnum = {
-  id: 'id',
-  symbol: 'symbol',
-  name: 'name',
-  baseAsset: 'baseAsset',
-  quoteAsset: 'quoteAsset',
-  createdAt: 'createdAt'
-} as const
-
-export type MarketScalarFieldEnum = (typeof MarketScalarFieldEnum)[keyof typeof MarketScalarFieldEnum]
-
-
 export const OrderScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  marketId: 'marketId',
+  symbol: 'symbol',
   side: 'side',
   orderType: 'orderType',
   price: 'price',
@@ -962,7 +875,7 @@ export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof Or
 
 export const FillScalarFieldEnum = {
   id: 'id',
-  marketId: 'marketId',
+  symbol: 'symbol',
   price: 'price',
   quantity: 'quantity',
   buyOrderId: 'buyOrderId',
@@ -977,7 +890,7 @@ export type FillScalarFieldEnum = (typeof FillScalarFieldEnum)[keyof typeof Fill
 export const BalanceScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  currency: 'currency',
+  asset: 'asset',
   available: 'available',
   locked: 'locked',
   updatedAt: 'updatedAt'
@@ -1132,6 +1045,20 @@ export type EnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pris
  * Reference to a field of type 'OrderStatus[]'
  */
 export type ListEnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Asset'
+ */
+export type EnumAssetFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Asset'>
+    
+
+
+/**
+ * Reference to a field of type 'Asset[]'
+ */
+export type ListEnumAssetFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Asset[]'>
     
 
 
@@ -1301,7 +1228,6 @@ export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaC
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   emailVerificationToken?: Prisma.EmailVerificationTokenOmit
-  market?: Prisma.MarketOmit
   order?: Prisma.OrderOmit
   fill?: Prisma.FillOmit
   balance?: Prisma.BalanceOmit

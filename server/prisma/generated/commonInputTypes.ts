@@ -361,6 +361,23 @@ export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedIntNullableFilter<$PrismaModel>
 }
 
+export type EnumAssetFilter<$PrismaModel = never> = {
+  equals?: $Enums.Asset | Prisma.EnumAssetFieldRefInput<$PrismaModel>
+  in?: $Enums.Asset[] | Prisma.ListEnumAssetFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Asset[] | Prisma.ListEnumAssetFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAssetFilter<$PrismaModel> | $Enums.Asset
+}
+
+export type EnumAssetWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.Asset | Prisma.EnumAssetFieldRefInput<$PrismaModel>
+  in?: $Enums.Asset[] | Prisma.ListEnumAssetFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Asset[] | Prisma.ListEnumAssetFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAssetWithAggregatesFilter<$PrismaModel> | $Enums.Asset
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAssetFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAssetFilter<$PrismaModel>
+}
+
 export type NestedIntFilter<$PrismaModel = never> = {
   equals?: number | Prisma.IntFieldRefInput<$PrismaModel>
   in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel>
@@ -719,6 +736,23 @@ export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
   _sum?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _max?: Prisma.NestedIntNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumAssetFilter<$PrismaModel = never> = {
+  equals?: $Enums.Asset | Prisma.EnumAssetFieldRefInput<$PrismaModel>
+  in?: $Enums.Asset[] | Prisma.ListEnumAssetFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Asset[] | Prisma.ListEnumAssetFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAssetFilter<$PrismaModel> | $Enums.Asset
+}
+
+export type NestedEnumAssetWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.Asset | Prisma.EnumAssetFieldRefInput<$PrismaModel>
+  in?: $Enums.Asset[] | Prisma.ListEnumAssetFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Asset[] | Prisma.ListEnumAssetFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAssetWithAggregatesFilter<$PrismaModel> | $Enums.Asset
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAssetFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAssetFilter<$PrismaModel>
 }
 
 

@@ -52,11 +52,6 @@ export type User = Prisma.UserModel
  */
 export type EmailVerificationToken = Prisma.EmailVerificationTokenModel
 /**
- * Model Market
- * 
- */
-export type Market = Prisma.MarketModel
-/**
  * Model Order
  * 
  */

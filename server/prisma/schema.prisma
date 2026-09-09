@@ -9,33 +9,29 @@ datasource db {
   provider = "postgresql"
 }
 
-  model User {
-    id            Int       @id @default(autoincrement())
-    email         String    @unique
-    username      String    @unique
-    password      String
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  username      String    @unique
+  password      String
+  emailVerified Boolean   @default(false)
+  refreshToken  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-    emailVerified Boolean   @default(false)
-
-    refreshToken  String?
-
-    createdAt     DateTime  @default(now())
-    updatedAt     DateTime  @updatedAt
-
-    balances      Balance[]
-    fills         Fill[]   @relation("userFills")
-    orders        Order[]
-
-    emailVerificationTokens EmailVerificationToken[]
-  }
+  balances      Balance[]
+  fills         Fill[]    @relation("userFills")
+  orders        Order[]
+  emailVerificationTokens EmailVerificationToken[]
+}
 
 model EmailVerificationToken {
-  id        Int      @id @default(autoincrement())
-  tokenHash String   @unique
+  id        Int       @id @default(autoincrement())
+  tokenHash String    @unique
   userId    Int
   expiresAt DateTime
   usedAt    DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -43,21 +39,10 @@ model EmailVerificationToken {
   @@index([expiresAt])
 }
 
-model Market {
-  id         Int      @id @default(autoincrement())
-  symbol     String   @unique
-  name       String
-  baseAsset  String
-  quoteAsset String
-  createdAt  DateTime @default(now())
-  fills      Fill[]
-  orders     Order[]
-}
-
 model Order {
   id        BigInt      @id @default(autoincrement())
   userId    Int
-  marketId  Int
+  symbol    String      // e.g. "BTCUSD" — the trading pair this order belongs to
   side      Side
   orderType OrderType
   price     Decimal?    @db.Decimal(30, 10)
@@ -66,43 +51,51 @@ model Order {
   status    OrderStatus @default(PENDING)
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
-  buyFills  Fill[]      @relation("buyFills")
-  sellFills Fill[]      @relation("sellFills")
-  market    Market      @relation(fields: [marketId], references: [id])
-  user      User        @relation(fields: [userId], references: [id])
+
+  buyFills  Fill[] @relation("buyFills")
+  sellFills Fill[] @relation("sellFills")
+  user      User   @relation(fields: [userId], references: [id])
 
   @@index([userId])
-  @@index([marketId, status])
+  @@index([symbol, status])
 }
 
 model Fill {
   id          BigInt   @id @default(autoincrement())
-  marketId    Int
+  symbol      String   // e.g. "BTCUSD" — denormalized for fast market-level queries
   price       Decimal  @db.Decimal(30, 10)
   quantity    Decimal  @db.Decimal(30, 10)
   buyOrderId  BigInt?
   sellOrderId BigInt?
   userId      Int?
   createdAt   DateTime @default(now())
-  buyOrder    Order?   @relation("buyFills", fields: [buyOrderId], references: [id])
-  market      Market   @relation(fields: [marketId], references: [id])
-  sellOrder   Order?   @relation("sellFills", fields: [sellOrderId], references: [id])
-  user        User?    @relation("userFills", fields: [userId], references: [id])
 
-  @@index([marketId, createdAt])
+  buyOrder  Order? @relation("buyFills", fields: [buyOrderId], references: [id])
+  sellOrder Order? @relation("sellFills", fields: [sellOrderId], references: [id])
+  user      User?  @relation("userFills", fields: [userId], references: [id])
+
+  @@index([symbol, createdAt])
+  @@index([buyOrderId])
+  @@index([sellOrderId])
 }
 
 model Balance {
   id        Int      @id @default(autoincrement())
   userId    Int
-  currency  String
+  asset     Asset
   available Decimal  @default(0) @db.Decimal(30, 10)
   locked    Decimal  @default(0) @db.Decimal(30, 10)
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
 
-  @@unique([userId, currency])
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, asset])
   @@index([userId])
+}
+
+enum Asset {
+  USD
+  BTC
 }
 
 enum Side {

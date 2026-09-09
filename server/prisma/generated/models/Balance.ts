@@ -43,7 +43,7 @@ export type BalanceSumAggregateOutputType = {
 export type BalanceMinAggregateOutputType = {
   id: number | null
   userId: number | null
-  currency: string | null
+  asset: $Enums.Asset | null
   available: runtime.Decimal | null
   locked: runtime.Decimal | null
   updatedAt: Date | null
@@ -52,7 +52,7 @@ export type BalanceMinAggregateOutputType = {
 export type BalanceMaxAggregateOutputType = {
   id: number | null
   userId: number | null
-  currency: string | null
+  asset: $Enums.Asset | null
   available: runtime.Decimal | null
   locked: runtime.Decimal | null
   updatedAt: Date | null
@@ -61,7 +61,7 @@ export type BalanceMaxAggregateOutputType = {
 export type BalanceCountAggregateOutputType = {
   id: number
   userId: number
-  currency: number
+  asset: number
   available: number
   locked: number
   updatedAt: number
@@ -86,7 +86,7 @@ export type BalanceSumAggregateInputType = {
 export type BalanceMinAggregateInputType = {
   id?: true
   userId?: true
-  currency?: true
+  asset?: true
   available?: true
   locked?: true
   updatedAt?: true
@@ -95,7 +95,7 @@ export type BalanceMinAggregateInputType = {
 export type BalanceMaxAggregateInputType = {
   id?: true
   userId?: true
-  currency?: true
+  asset?: true
   available?: true
   locked?: true
   updatedAt?: true
@@ -104,7 +104,7 @@ export type BalanceMaxAggregateInputType = {
 export type BalanceCountAggregateInputType = {
   id?: true
   userId?: true
-  currency?: true
+  asset?: true
   available?: true
   locked?: true
   updatedAt?: true
@@ -200,7 +200,7 @@ export type BalanceGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 export type BalanceGroupByOutputType = {
   id: number
   userId: number
-  currency: string
+  asset: $Enums.Asset
   available: runtime.Decimal
   locked: runtime.Decimal
   updatedAt: Date
@@ -232,7 +232,7 @@ export type BalanceWhereInput = {
   NOT?: Prisma.BalanceWhereInput | Prisma.BalanceWhereInput[]
   id?: Prisma.IntFilter<"Balance"> | number
   userId?: Prisma.IntFilter<"Balance"> | number
-  currency?: Prisma.StringFilter<"Balance"> | string
+  asset?: Prisma.EnumAssetFilter<"Balance"> | $Enums.Asset
   available?: Prisma.DecimalFilter<"Balance"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   locked?: Prisma.DecimalFilter<"Balance"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Prisma.DateTimeFilter<"Balance"> | Date | string
@@ -242,7 +242,7 @@ export type BalanceWhereInput = {
 export type BalanceOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  currency?: Prisma.SortOrder
+  asset?: Prisma.SortOrder
   available?: Prisma.SortOrder
   locked?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -251,22 +251,22 @@ export type BalanceOrderByWithRelationInput = {
 
 export type BalanceWhereUniqueInput = Prisma.AtLeast<{
   id?: number
-  userId_currency?: Prisma.BalanceUserIdCurrencyCompoundUniqueInput
+  userId_asset?: Prisma.BalanceUserIdAssetCompoundUniqueInput
   AND?: Prisma.BalanceWhereInput | Prisma.BalanceWhereInput[]
   OR?: Prisma.BalanceWhereInput[]
   NOT?: Prisma.BalanceWhereInput | Prisma.BalanceWhereInput[]
   userId?: Prisma.IntFilter<"Balance"> | number
-  currency?: Prisma.StringFilter<"Balance"> | string
+  asset?: Prisma.EnumAssetFilter<"Balance"> | $Enums.Asset
   available?: Prisma.DecimalFilter<"Balance"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   locked?: Prisma.DecimalFilter<"Balance"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Prisma.DateTimeFilter<"Balance"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-}, "id" | "userId_currency">
+}, "id" | "userId_asset">
 
 export type BalanceOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  currency?: Prisma.SortOrder
+  asset?: Prisma.SortOrder
   available?: Prisma.SortOrder
   locked?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -283,14 +283,14 @@ export type BalanceScalarWhereWithAggregatesInput = {
   NOT?: Prisma.BalanceScalarWhereWithAggregatesInput | Prisma.BalanceScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Balance"> | number
   userId?: Prisma.IntWithAggregatesFilter<"Balance"> | number
-  currency?: Prisma.StringWithAggregatesFilter<"Balance"> | string
+  asset?: Prisma.EnumAssetWithAggregatesFilter<"Balance"> | $Enums.Asset
   available?: Prisma.DecimalWithAggregatesFilter<"Balance"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   locked?: Prisma.DecimalWithAggregatesFilter<"Balance"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Balance"> | Date | string
 }
 
 export type BalanceCreateInput = {
-  currency: string
+  asset: $Enums.Asset
   available?: runtime.Decimal | runtime.DecimalJsLike | number | string
   locked?: runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Date | string
@@ -300,14 +300,14 @@ export type BalanceCreateInput = {
 export type BalanceUncheckedCreateInput = {
   id?: number
   userId: number
-  currency: string
+  asset: $Enums.Asset
   available?: runtime.Decimal | runtime.DecimalJsLike | number | string
   locked?: runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Date | string
 }
 
 export type BalanceUpdateInput = {
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  asset?: Prisma.EnumAssetFieldUpdateOperationsInput | $Enums.Asset
   available?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   locked?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -317,7 +317,7 @@ export type BalanceUpdateInput = {
 export type BalanceUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  asset?: Prisma.EnumAssetFieldUpdateOperationsInput | $Enums.Asset
   available?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   locked?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -326,14 +326,14 @@ export type BalanceUncheckedUpdateInput = {
 export type BalanceCreateManyInput = {
   id?: number
   userId: number
-  currency: string
+  asset: $Enums.Asset
   available?: runtime.Decimal | runtime.DecimalJsLike | number | string
   locked?: runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Date | string
 }
 
 export type BalanceUpdateManyMutationInput = {
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  asset?: Prisma.EnumAssetFieldUpdateOperationsInput | $Enums.Asset
   available?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   locked?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -342,7 +342,7 @@ export type BalanceUpdateManyMutationInput = {
 export type BalanceUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  asset?: Prisma.EnumAssetFieldUpdateOperationsInput | $Enums.Asset
   available?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   locked?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -358,15 +358,15 @@ export type BalanceOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type BalanceUserIdCurrencyCompoundUniqueInput = {
+export type BalanceUserIdAssetCompoundUniqueInput = {
   userId: number
-  currency: string
+  asset: $Enums.Asset
 }
 
 export type BalanceCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  currency?: Prisma.SortOrder
+  asset?: Prisma.SortOrder
   available?: Prisma.SortOrder
   locked?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -382,7 +382,7 @@ export type BalanceAvgOrderByAggregateInput = {
 export type BalanceMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  currency?: Prisma.SortOrder
+  asset?: Prisma.SortOrder
   available?: Prisma.SortOrder
   locked?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -391,7 +391,7 @@ export type BalanceMaxOrderByAggregateInput = {
 export type BalanceMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  currency?: Prisma.SortOrder
+  asset?: Prisma.SortOrder
   available?: Prisma.SortOrder
   locked?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -446,8 +446,12 @@ export type BalanceUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.BalanceScalarWhereInput | Prisma.BalanceScalarWhereInput[]
 }
 
+export type EnumAssetFieldUpdateOperationsInput = {
+  set?: $Enums.Asset
+}
+
 export type BalanceCreateWithoutUserInput = {
-  currency: string
+  asset: $Enums.Asset
   available?: runtime.Decimal | runtime.DecimalJsLike | number | string
   locked?: runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Date | string
@@ -455,7 +459,7 @@ export type BalanceCreateWithoutUserInput = {
 
 export type BalanceUncheckedCreateWithoutUserInput = {
   id?: number
-  currency: string
+  asset: $Enums.Asset
   available?: runtime.Decimal | runtime.DecimalJsLike | number | string
   locked?: runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Date | string
@@ -493,7 +497,7 @@ export type BalanceScalarWhereInput = {
   NOT?: Prisma.BalanceScalarWhereInput | Prisma.BalanceScalarWhereInput[]
   id?: Prisma.IntFilter<"Balance"> | number
   userId?: Prisma.IntFilter<"Balance"> | number
-  currency?: Prisma.StringFilter<"Balance"> | string
+  asset?: Prisma.EnumAssetFilter<"Balance"> | $Enums.Asset
   available?: Prisma.DecimalFilter<"Balance"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   locked?: Prisma.DecimalFilter<"Balance"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Prisma.DateTimeFilter<"Balance"> | Date | string
@@ -501,14 +505,14 @@ export type BalanceScalarWhereInput = {
 
 export type BalanceCreateManyUserInput = {
   id?: number
-  currency: string
+  asset: $Enums.Asset
   available?: runtime.Decimal | runtime.DecimalJsLike | number | string
   locked?: runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Date | string
 }
 
 export type BalanceUpdateWithoutUserInput = {
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  asset?: Prisma.EnumAssetFieldUpdateOperationsInput | $Enums.Asset
   available?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   locked?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -516,7 +520,7 @@ export type BalanceUpdateWithoutUserInput = {
 
 export type BalanceUncheckedUpdateWithoutUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  asset?: Prisma.EnumAssetFieldUpdateOperationsInput | $Enums.Asset
   available?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   locked?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -524,7 +528,7 @@ export type BalanceUncheckedUpdateWithoutUserInput = {
 
 export type BalanceUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  asset?: Prisma.EnumAssetFieldUpdateOperationsInput | $Enums.Asset
   available?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   locked?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -535,7 +539,7 @@ export type BalanceUncheckedUpdateManyWithoutUserInput = {
 export type BalanceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  currency?: boolean
+  asset?: boolean
   available?: boolean
   locked?: boolean
   updatedAt?: boolean
@@ -545,7 +549,7 @@ export type BalanceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type BalanceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  currency?: boolean
+  asset?: boolean
   available?: boolean
   locked?: boolean
   updatedAt?: boolean
@@ -555,7 +559,7 @@ export type BalanceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
 export type BalanceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  currency?: boolean
+  asset?: boolean
   available?: boolean
   locked?: boolean
   updatedAt?: boolean
@@ -565,13 +569,13 @@ export type BalanceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
 export type BalanceSelectScalar = {
   id?: boolean
   userId?: boolean
-  currency?: boolean
+  asset?: boolean
   available?: boolean
   locked?: boolean
   updatedAt?: boolean
 }
 
-export type BalanceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "currency" | "available" | "locked" | "updatedAt", ExtArgs["result"]["balance"]>
+export type BalanceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "asset" | "available" | "locked" | "updatedAt", ExtArgs["result"]["balance"]>
 export type BalanceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -590,7 +594,7 @@ export type $BalancePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     userId: number
-    currency: string
+    asset: $Enums.Asset
     available: runtime.Decimal
     locked: runtime.Decimal
     updatedAt: Date
@@ -1020,7 +1024,7 @@ export interface Prisma__BalanceClient<T, Null = never, ExtArgs extends runtime.
 export interface BalanceFieldRefs {
   readonly id: Prisma.FieldRef<"Balance", 'Int'>
   readonly userId: Prisma.FieldRef<"Balance", 'Int'>
-  readonly currency: Prisma.FieldRef<"Balance", 'String'>
+  readonly asset: Prisma.FieldRef<"Balance", 'Asset'>
   readonly available: Prisma.FieldRef<"Balance", 'Decimal'>
   readonly locked: Prisma.FieldRef<"Balance", 'Decimal'>
   readonly updatedAt: Prisma.FieldRef<"Balance", 'DateTime'>
