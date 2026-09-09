@@ -6,7 +6,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 interface AccessTokenPayload extends JwtPayload {
-    _id: string;
+    id: number;
 }
 
 const authMiddleware = asyncHandler(
@@ -26,14 +26,10 @@ const authMiddleware = asyncHandler(
 
         const user = await prisma.user.findUniqueOrThrow({
             where: {
-                id: parseInt(decodedToken._id),
+                id: decodedToken.id,
             },
             select: { id: true, username: true, email: true },
         });
-
-        if (!user) {
-            throw new ApiError(401, "Invalid access token");
-        }
 
         req.user = user;
 
