@@ -9,10 +9,8 @@ import { ApiResponse } from "../utils/ApiResponse";
 import { asyncHandler } from "../utils/asyncHandler.ts";
 import { generateTokens } from "../services/tokenService.ts"
 import { signUp, signIn, password } from "../schemas/user.schema.ts";
-import { generateVerificationToken } from "../services/emailVerification.ts";
 import { hashVerificationToken, sendVerificationEmail } from "../services/emailVerification.ts";
-import { tr } from "zod/locales";
-import { ref } from "process";
+import { STARTING_BALANCES } from "../constants/balances.ts";
 
 
 const user = {
@@ -39,15 +37,40 @@ const user = {
         // hash pass
         const hashPass = await bcrypt.hash(password, 12);
 
-        // create user with provided credentials 
-        const user = await prisma.user.create({
-            data: {
-                username,
-                email,
-                password: hashPass,
-            },
-            select: { id: true, username: true, email: true, emailVerified: true, createdAt: true }
-        })
+        // create user with starting balances
+        const user = await prisma.$transaction(async (tx) => {
+            const createdUser = await tx.user.create({
+                data: {
+                    username,
+                    email,
+                    password: hashPass,
+                },
+                select: {
+                    id: true,
+                    username: true,
+                    email: true,
+                    emailVerified: true,
+                    createdAt: true,
+                },
+            });
+
+            await tx.balance.createMany({
+                data: [
+                    {
+                        userId: createdUser.id,
+                        asset: "USD",
+                        available: STARTING_BALANCES.USD,
+                    },
+                    {
+                        userId: createdUser.id,
+                        asset: "BTC",
+                        available: STARTING_BALANCES.BTC,
+                    },
+                ],
+            });
+
+            return createdUser;
+        });
 
         // send verification email
         // const { emailId } = await sendVerificationEmail(user.id, email);
@@ -230,9 +253,7 @@ const user = {
     }),
 
     refreshToken: asyncHandler(async ( req: Request, res: Response ) => {
-
         
-
     }),
 
     me: asyncHandler(async (req: Request, res: Response) => {
