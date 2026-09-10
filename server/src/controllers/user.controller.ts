@@ -1,328 +1,283 @@
 import bcrypt from "bcrypt";
-import crypto from "crypto"
 import jwt from "jsonwebtoken";
-import { prisma } from "../utils/db.ts";
-import { resend } from "../utils/resend.ts";
-import { ApiError } from "../utils/ApiError.ts";
+import type { JwtPayload } from "jsonwebtoken";
 import type { Response, Request } from "express";
-import { ApiResponse } from "../utils/ApiResponse";
+import { prisma } from "../utils/db.ts";
+import { ApiError } from "../utils/ApiError.ts";
+import { ApiResponse } from "../utils/ApiResponse.ts";
 import { asyncHandler } from "../utils/asyncHandler.ts";
-import { generateTokens } from "../services/tokenService.ts"
+import { cookieOptions } from "../utils/cookies.ts";
+import { generateTokens } from "../services/tokenService.ts";
 import { signUp, signIn, password } from "../schemas/user.schema.ts";
 import { hashVerificationToken, sendVerificationEmail } from "../services/emailVerification.ts";
 import { STARTING_BALANCES } from "../constants/balances.ts";
 
+interface RefreshTokenPayload extends JwtPayload {
+  id: number;
+}
+
+const setAuthCookies = (res: Response, accessToken: string, refreshToken: string) => {
+  return res
+    .cookie("accessToken", accessToken, cookieOptions)
+    .cookie("refreshToken", refreshToken, cookieOptions);
+};
+
+const clearAuthCookies = (res: Response) => {
+  return res
+    .clearCookie("accessToken", cookieOptions)
+    .clearCookie("refreshToken", cookieOptions);
+};
+
+const persistRefreshToken = async (userId: number, refreshToken: string) => {
+  const hashedToken = await bcrypt.hash(refreshToken, 12);
+
+  return prisma.user.update({
+    where: { id: userId },
+    data: { refreshToken: hashedToken },
+    select: { id: true, username: true, email: true },
+  });
+};
 
 const user = {
+  signUp: asyncHandler(async (req: Request, res: Response) => {
+    const result = signUp.safeParse(req.body);
+    if (!result.success) {
+      throw new ApiError(
+        400,
+        "Validation failed",
+        result.error.issues.map((issue) => issue.message)
+      );
+    }
 
-    signUp: asyncHandler(async (req: Request, res: Response) => {
+    const { username, email, password } = result.data;
 
-        // validate and normalize input 
-        const result = signUp.safeParse(req.body);
-        if (!result.success) {
-            throw new ApiError(
-                400,
-                "Validation failed",
-                result.error.issues.map((issue) => issue.message)
-            );
-        }
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing) throw new ApiError(409, "User already exists");
 
-        // extract signup details 
-        const { username, email, password } = result.data;
+    const hashPass = await bcrypt.hash(password, 12);
 
-        // validate user 
-        const checkUser = await prisma.user.findUnique({ where: { email: email } });
-        if (checkUser) throw new ApiError(409, "user already exists !");
+    const createdUser = await prisma.$transaction(async (tx) => {
+      const userRow = await tx.user.create({
+        data: {
+          username,
+          email,
+          password: hashPass,
+        },
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          emailVerified: true,
+          createdAt: true,
+        },
+      });
 
-        // hash pass
-        const hashPass = await bcrypt.hash(password, 12);
+      await tx.balance.createMany({
+        data: [
+          {
+            userId: userRow.id,
+            asset: "USD",
+            available: STARTING_BALANCES.USD,
+          },
+          {
+            userId: userRow.id,
+            asset: "BTC",
+            available: STARTING_BALANCES.BTC,
+          },
+        ],
+      });
 
-        // create user with starting balances
-        const user = await prisma.$transaction(async (tx) => {
-            const createdUser = await tx.user.create({
-                data: {
-                    username,
-                    email,
-                    password: hashPass,
-                },
-                select: {
-                    id: true,
-                    username: true,
-                    email: true,
-                    emailVerified: true,
-                    createdAt: true,
-                },
-            });
+      return userRow;
+    });
 
-            await tx.balance.createMany({
-                data: [
-                    {
-                        userId: createdUser.id,
-                        asset: "USD",
-                        available: STARTING_BALANCES.USD,
-                    },
-                    {
-                        userId: createdUser.id,
-                        asset: "BTC",
-                        available: STARTING_BALANCES.BTC,
-                    },
-                ],
-            });
+    await sendVerificationEmail(createdUser.id, email);
 
-            return createdUser;
-        });
+    return res.status(201).json(
+      new ApiResponse(
+        201,
+        { email: createdUser.email },
+        "User created. Check your email to verify your account."
+      )
+    );
+  }),
 
-        // send verification email
-        // const { emailId } = await sendVerificationEmail(user.id, email);
+  signIn: asyncHandler(async (req: Request, res: Response) => {
+    const result = signIn.safeParse(req.body);
+    if (!result.success) {
+      throw new ApiError(
+        400,
+        "Validation failed",
+        result.error.issues.map((issue) => issue.message)
+      );
+    }
 
-        // return secure response 
-        res
-            .status(200)
-            .json(new ApiResponse(200, "User created successfully"))
+    const { email, password } = result.data;
 
-    }),
+    const found = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true, emailVerified: true, password: true },
+    });
 
-    signIn: asyncHandler(async (req: Request, res: Response) => {
+    if (!found) throw new ApiError(401, "Invalid email or password");
 
-        // validate and normalize input 
-        const result = signIn.safeParse(req.body);
-        if (!result.success) {
-            throw new ApiError(
-                400,
-                "Validation failed",
-                result.error.issues.map((issue) => issue.message)
-            );
-        }
+    if (!found.emailVerified) {
+      throw new ApiError(403, "Verify your email before signing in");
+    }
 
-        // extract signIn details 
-        const { email, password } = result.data;
+    const passwordOk = await bcrypt.compare(password, found.password);
+    if (!passwordOk) throw new ApiError(401, "Invalid email or password");
 
-        // validate user 
-        const user = await prisma.user.findUnique({
-            where: {
-                email: email,
-            },
-            select: { id: true, emailVerified: true, password: true }
-        })
+    const { refreshToken, accessToken } = generateTokens(found.id);
+    const updatedUser = await persistRefreshToken(found.id, refreshToken);
 
-        if (!user) throw new ApiError(401, "User doesnt exists !!!");
+    return setAuthCookies(res, accessToken, refreshToken)
+      .status(200)
+      .json(new ApiResponse(200, { user: updatedUser }, "User logged in successfully"));
+  }),
 
-        // if(!user?.emailVerified) throw new ApiError(403, "verify your email first !!!");
+  logOut: asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.id;
+    if (!userId) throw new ApiError(401, "Unauthorized");
 
-        // verify user password 
-        const verifyPass = await bcrypt.compare(password, user.password);
-        if (!verifyPass) throw new ApiError(401, "Invalid Password !!!");
+    await prisma.user.update({
+      where: { id: userId },
+      data: { refreshToken: null },
+    });
 
-        // generate tokens
-        const { refreshToken, accessToken } = generateTokens(user.id);
+    return clearAuthCookies(res)
+      .status(200)
+      .json(new ApiResponse(200, null, "User logged out"));
+  }),
 
-        // hash refresh token 
-        const hashedToken = await bcrypt.hash(refreshToken, 12);
+  changePassword: asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.id;
+    if (!userId) throw new ApiError(401, "Unauthorized");
 
-        // save hashed refresh token in db
-        const updatedUser = await prisma.user.update({
-            where: {
-                id: user.id
-            },
-            data: {
-                refreshToken: hashedToken
-            },
-            select: { id: true, username: true, email: true }
-        })
+    const result = password.safeParse(req.body);
+    if (!result.success) {
+      throw new ApiError(
+        400,
+        "Validation failed",
+        result.error.issues.map((issue) => issue.message)
+      );
+    }
 
-        const options = {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production"
-        }
+    const { oldPassword, newPassword } = result.data;
 
-        // set secure cookie and return success response 
-        return res
-            .status(200)
-            .cookie("accessToken", accessToken, options)
-            .cookie("refreshToken", refreshToken, options)
-            .json(
-                new ApiResponse(
-                    200,
-                    {
-                        user: updatedUser,
-                    },
-                    "user logged in successfully"
-                )
-            )
+    const found = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, password: true },
+    });
 
-    }),
+    if (!found) throw new ApiError(401, "Unauthorized");
 
-    // now these are authenticated controllers 
+    const isPassValid = await bcrypt.compare(oldPassword, found.password);
+    if (!isPassValid) throw new ApiError(401, "Invalid password");
 
-    logOut: asyncHandler(async (req: Request, res: Response) => {
+    const hashPass = await bcrypt.hash(newPassword, 12);
+    const { accessToken, refreshToken } = generateTokens(userId);
 
-        // fetch userId 
-        const userId = req.user?.id;
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        password: hashPass,
+        refreshToken: await bcrypt.hash(refreshToken, 12),
+      },
+    });
 
-        // revoke curr refresh token
-        await prisma.user.update({
+    return setAuthCookies(res, accessToken, refreshToken)
+      .status(200)
+      .json(new ApiResponse(200, null, "Password updated successfully"));
+  }),
 
-            where: {
-                id: userId
-            },
-            data: {
-                refreshToken: undefined
-            }
+  refreshToken: asyncHandler(async (req: Request, res: Response) => {
+    const incoming = req.cookies?.refreshToken as string | undefined;
+    if (!incoming) throw new ApiError(401, "Refresh token missing");
 
-        })
+    const secret = process.env.REFRESH_TOKEN_SECRET;
+    if (!secret) throw new ApiError(500, "REFRESH_TOKEN_SECRET is not configured");
 
-        const options = {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production"
-        }
+    let decoded: RefreshTokenPayload;
+    try {
+      decoded = jwt.verify(incoming, secret) as RefreshTokenPayload;
+    } catch {
+      throw new ApiError(401, "Invalid or expired refresh token");
+    }
 
-        // clear tokens and return secure response 
-        return res
-            .status(200)
-            .clearCookie("accessToken", options)
-            .clearCookie("refreshToken", options)
-            .json(
-                new ApiResponse(200, "User logged out")
-            )
-    }),
+    const found = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      select: { id: true, refreshToken: true, username: true, email: true },
+    });
 
-    changePassword: asyncHandler(async (req: Request, res: Response) => {
+    if (!found?.refreshToken) {
+      throw new ApiError(401, "Refresh token is not valid");
+    }
 
-        const userId = req.user?.id;
-        if (!userId) throw new ApiError(401, "Unauthorized !!!");
+    const matches = await bcrypt.compare(incoming, found.refreshToken);
+    if (!matches) throw new ApiError(401, "Refresh token is not valid");
 
-        // validate and normalize input 
-        const result = password.safeParse(req.body);
-        if (!result.success) throw new ApiError(
-            400,
-            "Validation failed !!",
-            result.error.issues.map(issue => issue.message)
+    const { accessToken, refreshToken } = generateTokens(found.id);
+    await persistRefreshToken(found.id, refreshToken);
+
+    return setAuthCookies(res, accessToken, refreshToken)
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { user: { id: found.id, username: found.username, email: found.email } },
+          "Tokens refreshed"
         )
+      );
+  }),
 
-        // extract input
-        const { oldPassword, newPassword } = result.data;
+  me: asyncHandler(async (req: Request, res: Response) => {
+    const { id, email, username } = req.user!;
 
-        // fetch authenticated user 
-        const user = await prisma.user.findUnique({
-            where: {
-                id: userId
-            },
-            select: { id: true, password: true }
-        })
+    return res.status(200).json(
+      new ApiResponse(200, { id, email, username }, "Fetched user details successfully")
+    );
+  }),
 
-        if (!user) throw new ApiError(401, "Unauthorized !!!");
+  verifyEmail: asyncHandler(async (req: Request, res: Response) => {
+    const { token } = req.query;
 
-        // verify current pass 
-        const isPassValid = await bcrypt.compare(oldPassword, user?.password);
-        if (!isPassValid) throw new ApiError(401, "Invalid Password");
+    if (typeof token !== "string" || !token) {
+      throw new ApiError(400, "Verification token is required");
+    }
 
-        // hash new pass
-        const hashPass = await bcrypt.hash(newPassword, 12);
+    const tokenHash = hashVerificationToken(token);
 
-        // rotate tokens 
-        const { accessToken, refreshToken } = generateTokens(userId!);
+    const verification = await prisma.emailVerificationToken.findUnique({
+      where: { tokenHash },
+    });
 
-        // hash refresh token
-        const hashedToken = await bcrypt.hash(refreshToken, 12);
+    if (!verification) {
+      throw new ApiError(400, "Invalid verification token");
+    }
 
-        // update user data 
-        await prisma.user.update({
-            where: {
-                id: userId,
-            },
-            data: {
-                password: hashPass,
-                refreshToken: hashedToken
-            }
-        })
+    if (verification.expiresAt < new Date()) {
+      throw new ApiError(400, "Verification token has expired");
+    }
 
-        const options = {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict" as const
-        }
+    if (verification.usedAt) {
+      throw new ApiError(400, "Verification token has already been used");
+    }
 
-        // return safe response 
-        return res
-            .status(200)
-            .cookie("accessToken", accessToken, options)
-            .cookie("refreshToken", refreshToken, options)
-            .json(
-                new ApiResponse(200, "Password updated successfully !!!")
-            )
-    }),
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: verification.userId },
+        data: { emailVerified: true },
+      }),
+      prisma.emailVerificationToken.update({
+        where: { id: verification.id },
+        data: { usedAt: new Date() },
+      }),
+    ]);
 
-    refreshToken: asyncHandler(async ( req: Request, res: Response ) => {
-        
-    }),
-
-    me: asyncHandler(async (req: Request, res: Response) => {
-
-        const { id, email, username } = req.user!;
-
-        return res.status(200).json(
-            new ApiResponse(
-                200,
-                { id, email, username },
-                "Fetched user details successfully"
-            )
-        );
-    }),
-
-    verifyEmail: asyncHandler(async (req: Request, res: Response) => {
-
-        const { token } = req.query;
-
-        if (typeof token !== "string" || !token) {
-            throw new ApiError(400, "Verification token is required");
-        }
-
-        const tokenHash = hashVerificationToken(token);
-
-        const verification =
-            await prisma.emailVerificationToken.findUnique({
-                where: {
-                    tokenHash,
-                },
-            });
-
-        if (!verification) {
-            throw new ApiError(400, "Invalid verification token");
-        }
-
-        if (verification.expiresAt < new Date()) {
-            throw new ApiError(400, "Verification token has expired");
-        }
-
-        if (verification.usedAt) {
-            throw new ApiError(400, "Verification token has already been used");
-        }
-
-        await prisma.$transaction([
-            prisma.user.update({
-                where: {
-                    id: verification.userId,
-                },
-                data: {
-                    emailVerified: true,
-                },
-            }),
-
-            prisma.emailVerificationToken.update({
-                where: {
-                    id: verification.id,
-                },
-                data: {
-                    usedAt: new Date(),
-                },
-            }),
-        ]);
-
-        return res.status(200).json({
-            success: true,
-            message: "Email verified successfully",
-        });
-    }),
-}
+    return res.status(200).json(
+      new ApiResponse(200, null, "Email verified successfully")
+    );
+  }),
+};
 
 export default user;
