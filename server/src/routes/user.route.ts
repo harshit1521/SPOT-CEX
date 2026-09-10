@@ -4,36 +4,15 @@ import authMiddleware from "../middlewares/auth.middleware.ts";
 
 const router = Router();
 
-router
-    .route("/signup")
-    .post(userController.signUp);
-
-router
-    .route("/signin")
-    .post(userController.signIn);
-
-router
-    .route("/verify-token")
-    .get(userController.verifyEmail)
-// secured routes
+router.post("/signup", userController.signUp);
+router.post("/signin", userController.signIn);
+router.get("/verify-token", userController.verifyEmail);
+router.post("/token", userController.refreshToken);
 
 router.use(authMiddleware);
 
-router
-    .route("/")
-    .get(userController.me);
-
-router
-    .route("/logout")
-    .post(userController.logOut);
-
-router
-    .route("/token")
-    .post(userController.refreshToken)
-
-router
-    .route("/password")
-    .post(userController.changePassword);
-
+router.get("/", userController.me);
+router.post("/logout", userController.logOut);
+router.post("/password", userController.changePassword);
 
 export default router;
