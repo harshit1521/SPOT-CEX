@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import type { SignOptions } from "jsonwebtoken";
 
 const generateRefreshToken = (userId: number): string => {
     const secret = process.env.REFRESH_TOKEN_SECRET;

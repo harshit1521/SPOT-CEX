@@ -29,8 +29,9 @@ const sendVerificationEmail =  async ( userId: number, email: string ) => {
       },
     });
   
+    const appUrl = process.env.APP_URL ?? "http://localhost:5173";
     const verificationUrl =
-      `${process.env.APP_URL}/verify-email?token=${encodeURIComponent(token)}`;
+      `${appUrl}/?verify=${encodeURIComponent(token)}`;
   
     const { data, error } = await resend.emails.send({
       from: "SPOT-CEX <no-reply@yourdomain.com>",
