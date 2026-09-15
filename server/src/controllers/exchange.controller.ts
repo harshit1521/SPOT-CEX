@@ -1,34 +1,31 @@
 import type { Request, Response } from "express";
 import type { Asset } from "../../prisma/generated/client.ts";
+import { Prisma } from "../../prisma/generated/client.ts";
 import { prisma } from "../utils/db.ts";
 import { ApiError } from "../utils/ApiError.ts";
 import { ApiResponse } from "../utils/ApiResponse.ts";
 import { asyncHandler } from "../utils/asyncHandler.ts";
 import { createOrder, orderIdParam, symbolParam } from "../schemas/exchange.schema.ts";
+import { placeOrder, cancelOrder, formatOrder } from "../services/order.service.ts";
 import {
-  cancelOrder,
   getMarketDepth,
   getOpenOrders,
   getOrderById,
-  getUserFills,
-  placeOrder,
+  getUserTrades,
 } from "../services/engine.service.ts";
 
-type BalanceView = {
-  available: string;
-  locked: string;
-};
+type BalanceView = { available: string; locked: string };
 
-const toBalanceView = (available: { toString(): string }, locked: { toString(): string }): BalanceView => ({
+const toBalanceView = (
+  available: { toString(): string },
+  locked: { toString(): string }
+): BalanceView => ({
   available: available.toString(),
   locked: locked.toString(),
 });
 
 const getUserBalances = async (userId: number): Promise<Record<Asset, BalanceView>> => {
-  const balances = await prisma.balance.findMany({
-    where: { userId },
-  });
-
+  const balances = await prisma.balance.findMany({ where: { userId } });
   const result: Partial<Record<Asset, BalanceView>> = {};
 
   for (const balance of balances) {
@@ -54,19 +51,47 @@ const exchange = {
     }
 
     const userId = req.user!.id;
-    const { side, type, symbol, price, qty } = parsed.data;
+    const { clientOrderId, side, orderType, symbol, price, quantity, quoteBudget } = parsed.data;
 
-    const result = await placeOrder(userId, {
-      side,
-      type,
-      symbol,
-      price: type === "LIMIT" ? price ?? null : null,
-      qty,
-    });
+    try {
+      const result = await placeOrder(userId, {
+        clientOrderId,
+        side,
+        orderType,
+        symbol,
+        price: price ?? null,
+        quantity,
+        quoteBudget: quoteBudget ?? null,
+      });
 
-    return res.status(200).json(
-      new ApiResponse(200, result, "Order placed successfully")
-    );
+      return res
+        .status(201)
+        .json(new ApiResponse(201, result, "Order placed successfully"));
+
+    } catch (err) {
+      if (
+        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err.code === "P2002"
+      ) {
+        const existingOrder = await prisma.order.findUnique({
+          where: { userId_clientOrderId: { userId, clientOrderId } },
+        });
+
+        if (existingOrder) {
+          return res
+            .status(200)
+            .json(
+              new ApiResponse(
+                200,
+                formatOrder(existingOrder),
+                "Order already exists (idempotent)"
+              )
+            );
+        }
+      }
+
+      throw err;
+    }
   }),
 
   order: asyncHandler(async (req: Request, res: Response) => {
@@ -82,9 +107,7 @@ const exchange = {
 
     const order = await getOrderById(req.user!.id, parsed.data.orderId);
 
-    return res.status(200).json(
-      new ApiResponse(200, order, "Order fetched successfully")
-    );
+    return res.status(200).json(new ApiResponse(200, order, "Order fetched successfully"));
   }),
 
   close: asyncHandler(async (req: Request, res: Response) => {
@@ -100,50 +123,36 @@ const exchange = {
 
     const order = await cancelOrder(req.user!.id, parsed.data.orderId);
 
-    return res.status(200).json(
-      new ApiResponse(200, order, "Order cancelled successfully")
-    );
+    return res.status(200).json(new ApiResponse(200, order, "Order cancelled successfully"));
   }),
 
   balance: asyncHandler(async (req: Request, res: Response) => {
-    const userId = req.user!.id;
-    const balances = await getUserBalances(userId);
-
-    return res.status(200).json(
-      new ApiResponse(200, balances, "Balances fetched successfully")
-    );
+    const balances = await getUserBalances(req.user!.id);
+    return res.status(200).json(new ApiResponse(200, balances, "Balances fetched successfully"));
   }),
 
   usd: asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user!.id;
     const balance = await prisma.balance.findUnique({
-      where: {
-        userId_asset: {
-          userId,
-          asset: "USD",
-        },
-      },
+      where: { userId_asset: { userId, asset: "USD" } },
     });
 
-    if (!balance) {
-      throw new ApiError(404, "USD balance not found");
-    }
+    if (!balance) throw new ApiError(404, "USD balance not found");
 
-    return res.status(200).json(
-      new ApiResponse(
-        200,
-        toBalanceView(balance.available, balance.locked),
-        "USD balance fetched successfully"
-      )
-    );
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          toBalanceView(balance.available, balance.locked),
+          "USD balance fetched successfully"
+        )
+      );
   }),
 
   open: asyncHandler(async (req: Request, res: Response) => {
     const orders = await getOpenOrders(req.user!.id);
-
-    return res.status(200).json(
-      new ApiResponse(200, orders, "Open orders fetched successfully")
-    );
+    return res.status(200).json(new ApiResponse(200, orders, "Open orders fetched successfully"));
   }),
 
   depth: asyncHandler(async (req: Request, res: Response) => {
@@ -159,17 +168,12 @@ const exchange = {
 
     const depth = await getMarketDepth(parsed.data.symbol);
 
-    return res.status(200).json(
-      new ApiResponse(200, depth, "Depth fetched successfully")
-    );
+    return res.status(200).json(new ApiResponse(200, depth, "Depth fetched successfully"));
   }),
 
   fills: asyncHandler(async (req: Request, res: Response) => {
-    const fills = await getUserFills(req.user!.id);
-
-    return res.status(200).json(
-      new ApiResponse(200, fills, "Fills fetched successfully")
-    );
+    const trades = await getUserTrades(req.user!.id);
+    return res.status(200).json(new ApiResponse(200, trades, "Trades fetched successfully"));
   }),
 };
 

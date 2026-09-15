@@ -9,7 +9,7 @@ import { asyncHandler } from "../utils/asyncHandler.ts";
 import { cookieOptions } from "../utils/cookies.ts";
 import { generateTokens } from "../services/tokenService.ts";
 import { signUp, signIn, password } from "../schemas/user.schema.ts";
-import { hashVerificationToken, sendVerificationEmail } from "../services/emailVerification.ts";
+import { hashVerificationToken, sendVerificationEmail, isEmailVerificationEnabled } from "../services/emailVerification.ts";
 import { STARTING_BALANCES } from "../constants/balances.ts";
 
 interface RefreshTokenPayload extends JwtPayload {
@@ -51,10 +51,24 @@ const user = {
 
     const { username, email, password } = result.data;
 
-    const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) throw new ApiError(409, "User already exists");
+    const existing = await prisma.user.findFirst({
+      where: {
+        OR: [{ email }, { username }],
+      },
+      select: { email: true, username: true },
+    });
+
+    if (existing) {
+      if (existing.email === email) {
+        throw new ApiError(409, "Email is already registered");
+      }
+
+      throw new ApiError(409, "Username is already taken");
+    }
 
     const hashPass = await bcrypt.hash(password, 12);
+
+    const verifyEmail = isEmailVerificationEnabled();
 
     const createdUser = await prisma.$transaction(async (tx) => {
       const userRow = await tx.user.create({
@@ -62,6 +76,7 @@ const user = {
           username,
           email,
           password: hashPass,
+          emailVerified: !verifyEmail,
         },
         select: {
           id: true,
@@ -90,13 +105,17 @@ const user = {
       return userRow;
     });
 
-    await sendVerificationEmail(createdUser.id, email);
+    if (verifyEmail) {
+      await sendVerificationEmail(createdUser.id, email);
+    }
 
     return res.status(201).json(
       new ApiResponse(
         201,
         { email: createdUser.email },
-        "User created. Check your email to verify your account."
+        verifyEmail
+          ? "User created. Check your email to verify your account."
+          : "User created successfully"
       )
     );
   }),
@@ -120,7 +139,7 @@ const user = {
 
     if (!found) throw new ApiError(401, "Invalid email or password");
 
-    if (!found.emailVerified) {
+    if (isEmailVerificationEnabled() && !found.emailVerified) {
       throw new ApiError(403, "Verify your email before signing in");
     }
 
