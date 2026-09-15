@@ -33,12 +33,27 @@ export type EmailVerificationToken = Prisma.EmailVerificationTokenModel
  */
 export type Order = Prisma.OrderModel
 /**
- * Model Fill
+ * Model Trade
  * 
  */
-export type Fill = Prisma.FillModel
+export type Trade = Prisma.TradeModel
 /**
  * Model Balance
  * 
  */
 export type Balance = Prisma.BalanceModel
+/**
+ * Model LedgerEntry
+ * 
+ */
+export type LedgerEntry = Prisma.LedgerEntryModel
+/**
+ * Model OutboxEvent
+ * 
+ */
+export type OutboxEvent = Prisma.OutboxEventModel
+/**
+ * Model ProcessedEvent
+ * 
+ */
+export type ProcessedEvent = Prisma.ProcessedEventModel

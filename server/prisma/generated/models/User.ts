@@ -241,8 +241,8 @@ export type UserWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   balances?: Prisma.BalanceListRelationFilter
-  fills?: Prisma.FillListRelationFilter
   orders?: Prisma.OrderListRelationFilter
+  ledgerEntries?: Prisma.LedgerEntryListRelationFilter
   emailVerificationTokens?: Prisma.EmailVerificationTokenListRelationFilter
 }
 
@@ -256,8 +256,8 @@ export type UserOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   balances?: Prisma.BalanceOrderByRelationAggregateInput
-  fills?: Prisma.FillOrderByRelationAggregateInput
   orders?: Prisma.OrderOrderByRelationAggregateInput
+  ledgerEntries?: Prisma.LedgerEntryOrderByRelationAggregateInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenOrderByRelationAggregateInput
 }
 
@@ -274,8 +274,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   balances?: Prisma.BalanceListRelationFilter
-  fills?: Prisma.FillListRelationFilter
   orders?: Prisma.OrderListRelationFilter
+  ledgerEntries?: Prisma.LedgerEntryListRelationFilter
   emailVerificationTokens?: Prisma.EmailVerificationTokenListRelationFilter
 }, "id" | "email" | "username">
 
@@ -318,8 +318,8 @@ export type UserCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
-  fills?: Prisma.FillCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  ledgerEntries?: Prisma.LedgerEntryCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
 }
 
@@ -333,8 +333,8 @@ export type UserUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
-  fills?: Prisma.FillUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  ledgerEntries?: Prisma.LedgerEntryUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -347,8 +347,8 @@ export type UserUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
-  fills?: Prisma.FillUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  ledgerEntries?: Prisma.LedgerEntryUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
 }
 
@@ -362,8 +362,8 @@ export type UserUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
-  fills?: Prisma.FillUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  ledgerEntries?: Prisma.LedgerEntryUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -445,11 +445,6 @@ export type UserScalarRelationFilter = {
   isNot?: Prisma.UserWhereInput
 }
 
-export type UserNullableScalarRelationFilter = {
-  is?: Prisma.UserWhereInput | null
-  isNot?: Prisma.UserWhereInput | null
-}
-
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -502,22 +497,6 @@ export type UserUpdateOneRequiredWithoutOrdersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutOrdersInput, Prisma.UserUpdateWithoutOrdersInput>, Prisma.UserUncheckedUpdateWithoutOrdersInput>
 }
 
-export type UserCreateNestedOneWithoutFillsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutFillsInput, Prisma.UserUncheckedCreateWithoutFillsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutFillsInput
-  connect?: Prisma.UserWhereUniqueInput
-}
-
-export type UserUpdateOneWithoutFillsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutFillsInput, Prisma.UserUncheckedCreateWithoutFillsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutFillsInput
-  upsert?: Prisma.UserUpsertWithoutFillsInput
-  disconnect?: Prisma.UserWhereInput | boolean
-  delete?: Prisma.UserWhereInput | boolean
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutFillsInput, Prisma.UserUpdateWithoutFillsInput>, Prisma.UserUncheckedUpdateWithoutFillsInput>
-}
-
 export type UserCreateNestedOneWithoutBalancesInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutBalancesInput, Prisma.UserUncheckedCreateWithoutBalancesInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutBalancesInput
@@ -532,6 +511,20 @@ export type UserUpdateOneRequiredWithoutBalancesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBalancesInput, Prisma.UserUpdateWithoutBalancesInput>, Prisma.UserUncheckedUpdateWithoutBalancesInput>
 }
 
+export type UserCreateNestedOneWithoutLedgerEntriesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLedgerEntriesInput, Prisma.UserUncheckedCreateWithoutLedgerEntriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLedgerEntriesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutLedgerEntriesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLedgerEntriesInput, Prisma.UserUncheckedCreateWithoutLedgerEntriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLedgerEntriesInput
+  upsert?: Prisma.UserUpsertWithoutLedgerEntriesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutLedgerEntriesInput, Prisma.UserUpdateWithoutLedgerEntriesInput>, Prisma.UserUncheckedUpdateWithoutLedgerEntriesInput>
+}
+
 export type UserCreateWithoutEmailVerificationTokensInput = {
   email: string
   username: string
@@ -541,8 +534,8 @@ export type UserCreateWithoutEmailVerificationTokensInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
-  fills?: Prisma.FillCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  ledgerEntries?: Prisma.LedgerEntryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEmailVerificationTokensInput = {
@@ -555,8 +548,8 @@ export type UserUncheckedCreateWithoutEmailVerificationTokensInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
-  fills?: Prisma.FillUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  ledgerEntries?: Prisma.LedgerEntryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEmailVerificationTokensInput = {
@@ -584,8 +577,8 @@ export type UserUpdateWithoutEmailVerificationTokensInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
-  fills?: Prisma.FillUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  ledgerEntries?: Prisma.LedgerEntryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmailVerificationTokensInput = {
@@ -598,8 +591,8 @@ export type UserUncheckedUpdateWithoutEmailVerificationTokensInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
-  fills?: Prisma.FillUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  ledgerEntries?: Prisma.LedgerEntryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutOrdersInput = {
@@ -611,7 +604,7 @@ export type UserCreateWithoutOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
-  fills?: Prisma.FillCreateNestedManyWithoutUserInput
+  ledgerEntries?: Prisma.LedgerEntryCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
 }
 
@@ -625,7 +618,7 @@ export type UserUncheckedCreateWithoutOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
-  fills?: Prisma.FillUncheckedCreateNestedManyWithoutUserInput
+  ledgerEntries?: Prisma.LedgerEntryUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -654,7 +647,7 @@ export type UserUpdateWithoutOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
-  fills?: Prisma.FillUpdateManyWithoutUserNestedInput
+  ledgerEntries?: Prisma.LedgerEntryUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
 }
 
@@ -668,77 +661,7 @@ export type UserUncheckedUpdateWithoutOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
-  fills?: Prisma.FillUncheckedUpdateManyWithoutUserNestedInput
-  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
-}
-
-export type UserCreateWithoutFillsInput = {
-  email: string
-  username: string
-  password: string
-  emailVerified?: boolean
-  refreshToken?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
-  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
-  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
-}
-
-export type UserUncheckedCreateWithoutFillsInput = {
-  id?: number
-  email: string
-  username: string
-  password: string
-  emailVerified?: boolean
-  refreshToken?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
-  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
-  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
-}
-
-export type UserCreateOrConnectWithoutFillsInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutFillsInput, Prisma.UserUncheckedCreateWithoutFillsInput>
-}
-
-export type UserUpsertWithoutFillsInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutFillsInput, Prisma.UserUncheckedUpdateWithoutFillsInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutFillsInput, Prisma.UserUncheckedCreateWithoutFillsInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutFillsInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutFillsInput, Prisma.UserUncheckedUpdateWithoutFillsInput>
-}
-
-export type UserUpdateWithoutFillsInput = {
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
-  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
-  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
-}
-
-export type UserUncheckedUpdateWithoutFillsInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
-  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  ledgerEntries?: Prisma.LedgerEntryUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -750,8 +673,8 @@ export type UserCreateWithoutBalancesInput = {
   refreshToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  fills?: Prisma.FillCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  ledgerEntries?: Prisma.LedgerEntryCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
 }
 
@@ -764,8 +687,8 @@ export type UserUncheckedCreateWithoutBalancesInput = {
   refreshToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  fills?: Prisma.FillUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  ledgerEntries?: Prisma.LedgerEntryUncheckedCreateNestedManyWithoutUserInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -793,8 +716,8 @@ export type UserUpdateWithoutBalancesInput = {
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  fills?: Prisma.FillUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  ledgerEntries?: Prisma.LedgerEntryUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
 }
 
@@ -807,7 +730,77 @@ export type UserUncheckedUpdateWithoutBalancesInput = {
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  fills?: Prisma.FillUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  ledgerEntries?: Prisma.LedgerEntryUncheckedUpdateManyWithoutUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutLedgerEntriesInput = {
+  email: string
+  username: string
+  password: string
+  emailVerified?: boolean
+  refreshToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutLedgerEntriesInput = {
+  id?: number
+  email: string
+  username: string
+  password: string
+  emailVerified?: boolean
+  refreshToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutLedgerEntriesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutLedgerEntriesInput, Prisma.UserUncheckedCreateWithoutLedgerEntriesInput>
+}
+
+export type UserUpsertWithoutLedgerEntriesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutLedgerEntriesInput, Prisma.UserUncheckedUpdateWithoutLedgerEntriesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutLedgerEntriesInput, Prisma.UserUncheckedCreateWithoutLedgerEntriesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutLedgerEntriesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutLedgerEntriesInput, Prisma.UserUncheckedUpdateWithoutLedgerEntriesInput>
+}
+
+export type UserUpdateWithoutLedgerEntriesInput = {
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutLedgerEntriesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -819,15 +812,15 @@ export type UserUncheckedUpdateWithoutBalancesInput = {
 
 export type UserCountOutputType = {
   balances: number
-  fills: number
   orders: number
+  ledgerEntries: number
   emailVerificationTokens: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   balances?: boolean | UserCountOutputTypeCountBalancesArgs
-  fills?: boolean | UserCountOutputTypeCountFillsArgs
   orders?: boolean | UserCountOutputTypeCountOrdersArgs
+  ledgerEntries?: boolean | UserCountOutputTypeCountLedgerEntriesArgs
   emailVerificationTokens?: boolean | UserCountOutputTypeCountEmailVerificationTokensArgs
 }
 
@@ -851,15 +844,15 @@ export type UserCountOutputTypeCountBalancesArgs<ExtArgs extends runtime.Types.E
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountFillsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.FillWhereInput
+export type UserCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OrderWhereInput
 }
 
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.OrderWhereInput
+export type UserCountOutputTypeCountLedgerEntriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LedgerEntryWhereInput
 }
 
 /**
@@ -880,8 +873,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdAt?: boolean
   updatedAt?: boolean
   balances?: boolean | Prisma.User$balancesArgs<ExtArgs>
-  fills?: boolean | Prisma.User$fillsArgs<ExtArgs>
   orders?: boolean | Prisma.User$ordersArgs<ExtArgs>
+  ledgerEntries?: boolean | Prisma.User$ledgerEntriesArgs<ExtArgs>
   emailVerificationTokens?: boolean | Prisma.User$emailVerificationTokensArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -922,8 +915,8 @@ export type UserSelectScalar = {
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "username" | "password" | "emailVerified" | "refreshToken" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   balances?: boolean | Prisma.User$balancesArgs<ExtArgs>
-  fills?: boolean | Prisma.User$fillsArgs<ExtArgs>
   orders?: boolean | Prisma.User$ordersArgs<ExtArgs>
+  ledgerEntries?: boolean | Prisma.User$ledgerEntriesArgs<ExtArgs>
   emailVerificationTokens?: boolean | Prisma.User$emailVerificationTokensArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -934,8 +927,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "User"
   objects: {
     balances: Prisma.$BalancePayload<ExtArgs>[]
-    fills: Prisma.$FillPayload<ExtArgs>[]
     orders: Prisma.$OrderPayload<ExtArgs>[]
+    ledgerEntries: Prisma.$LedgerEntryPayload<ExtArgs>[]
     emailVerificationTokens: Prisma.$EmailVerificationTokenPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1342,8 +1335,8 @@ readonly fields: UserFieldRefs;
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   balances<T extends Prisma.User$balancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$balancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BalancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  fills<T extends Prisma.User$fillsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$fillsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FillPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   orders<T extends Prisma.User$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  ledgerEntries<T extends Prisma.User$ledgerEntriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ledgerEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LedgerEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   emailVerificationTokens<T extends Prisma.User$emailVerificationTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$emailVerificationTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailVerificationTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1799,30 +1792,6 @@ export type User$balancesArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 }
 
 /**
- * User.fills
- */
-export type User$fillsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Fill
-   */
-  select?: Prisma.FillSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Fill
-   */
-  omit?: Prisma.FillOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.FillInclude<ExtArgs> | null
-  where?: Prisma.FillWhereInput
-  orderBy?: Prisma.FillOrderByWithRelationInput | Prisma.FillOrderByWithRelationInput[]
-  cursor?: Prisma.FillWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.FillScalarFieldEnum | Prisma.FillScalarFieldEnum[]
-}
-
-/**
  * User.orders
  */
 export type User$ordersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1844,6 +1813,30 @@ export type User$ordersArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   distinct?: Prisma.OrderScalarFieldEnum | Prisma.OrderScalarFieldEnum[]
+}
+
+/**
+ * User.ledgerEntries
+ */
+export type User$ledgerEntriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LedgerEntry
+   */
+  select?: Prisma.LedgerEntrySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LedgerEntry
+   */
+  omit?: Prisma.LedgerEntryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LedgerEntryInclude<ExtArgs> | null
+  where?: Prisma.LedgerEntryWhereInput
+  orderBy?: Prisma.LedgerEntryOrderByWithRelationInput | Prisma.LedgerEntryOrderByWithRelationInput[]
+  cursor?: Prisma.LedgerEntryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LedgerEntryScalarFieldEnum | Prisma.LedgerEntryScalarFieldEnum[]
 }
 
 /**

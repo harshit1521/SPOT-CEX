@@ -41,3 +41,22 @@ export const OrderStatus = {
 } as const
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
+
+
+export const OutboxEventType = {
+  ORDER_ACCEPTED: 'ORDER_ACCEPTED',
+  ORDER_CANCELLED: 'ORDER_CANCELLED'
+} as const
+
+export type OutboxEventType = (typeof OutboxEventType)[keyof typeof OutboxEventType]
+
+
+export const LedgerEntryType = {
+  ORDER_LOCK: 'ORDER_LOCK',
+  ORDER_UNLOCK: 'ORDER_UNLOCK',
+  TRADE_DEBIT: 'TRADE_DEBIT',
+  TRADE_CREDIT: 'TRADE_CREDIT',
+  FEE: 'FEE'
+} as const
+
+export type LedgerEntryType = (typeof LedgerEntryType)[keyof typeof LedgerEntryType]
