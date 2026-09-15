@@ -13,7 +13,7 @@ router
     .get("/order/:orderId", exchange.order)
     .get("/fills", exchange.fills)
     .post("/order", exchange.create)
-    .delete("/order/:orderId", exchange.close) 
+    .delete("/order/:orderId", exchange.close)
 
 
 export default router;
