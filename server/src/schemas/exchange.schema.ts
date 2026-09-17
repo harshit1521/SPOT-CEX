@@ -1,8 +1,7 @@
 import { z } from "zod";
 
 /**
- * createOrder — Zod schema for POST /exchange/order
- *
+ * 
  * clientOrderId  — caller-generated idempotency key.
  *                  DB enforces unique(userId, clientOrderId) so a retry
  *                  with the same key never creates a duplicate order.
