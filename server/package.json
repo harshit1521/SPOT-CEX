@@ -1,9 +1,19 @@
 {
   "name": "server",
-  "module": "index.ts",
+  "module": "app.ts",
   "type": "module",
   "private": true,
+  "scripts": {
+    "dev": "nodemon",
+    "start": "bun run app.ts",
+    "start:node": "tsx app.ts",
+    "prisma": "bunx --bun prisma",
+    "db:push": "bunx --bun prisma db push",
+    "db:generate": "bunx --bun prisma generate",
+    "db:studio": "bunx --bun prisma studio"
+  },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/bun": "latest",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
@@ -11,15 +21,16 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.2.0",
     "@types/pg": "^8.23.1",
-    "prisma": "^7.9.1",
+    "nodemon": "^3.1.14",
+    "prisma": "7.10.0",
     "tsx": "^4.23.12"
   },
   "peerDependencies": {
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.9.1",
-    "@prisma/client": "^7.9.1",
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
@@ -27,6 +38,7 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.23.0",
+    "redis": "^6.2.1",
     "resend": "^6.22.1",
     "zod": "^4.4.3"
   }

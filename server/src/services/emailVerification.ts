@@ -83,4 +83,8 @@ const sendVerificationEmail =  async ( userId: number, email: string ) => {
     };
   }
 
-export { generateVerificationToken, hashVerificationToken, sendVerificationEmail};
+export const isEmailVerificationEnabled = (): boolean => {
+  return process.env.SKIP_EMAIL_VERIFICATION !== "true";
+};
+
+export { generateVerificationToken, hashVerificationToken, sendVerificationEmail };

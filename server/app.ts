@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./src/middlewares/errorHandler";
-import { initializeEngine } from "./src/services/engine.service.ts";
 
 const app = express();
 
@@ -28,6 +27,8 @@ app.use("/api/v1/exchange", exchange);
 
 app.use(errorHandler);
 
-await initializeEngine();
+const PORT = Number(process.env.PORT ?? 3001);
 
-app.listen(3000, () => { console.log("server is listening to port: 3001"); });
+app.listen(PORT, () => {
+  console.log(`server is listening to port: ${PORT}`);
+});
