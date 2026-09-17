@@ -24,10 +24,7 @@ export const getRedis = async (): Promise<RedisClientType> => {
   return _client;
 };
 
-export const publishJson = async (
-  stream: string,
-  payload: Record<string, unknown>
-): Promise<string> => {
+export const publishJson = async (stream: string, payload: Record<string, unknown>): Promise<string> => {
   const redis = await getRedis();
   return redis.xAdd(stream, "*", { data: JSON.stringify(payload) });
 };
