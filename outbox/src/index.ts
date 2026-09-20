@@ -1,7 +1,6 @@
 import "dotenv/config";
 import { PrismaClient } from "../prisma/generated/client.js";
-import { Redis } from "@upstash/redis";
-
+import { createClient } from "redis";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const adapter = new PrismaPg({
@@ -9,9 +8,8 @@ const adapter = new PrismaPg({
 });
 
 const prisma = new PrismaClient({ adapter });
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+const redis = createClient({
+  url: process.env.REDIS_URL ?? "redis://localhost:6379",
 });
 
 const STREAM = "cex:order-events";
@@ -68,6 +66,7 @@ async function main() {
       }
     } catch (err) {
       console.error("[outbox] Error:", err);
+
     }
   }
 }
