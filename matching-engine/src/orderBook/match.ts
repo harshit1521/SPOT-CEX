@@ -73,12 +73,12 @@ const matchAgainstAsks = (
 
   while (remainingQty > 0) {
     const askPrices = getSortedAskPrices(book);
+    const askPrice = askPrices[0];
 
-    if (askPrices.length === 0 || askPrices[0] > limitPrice) {
+    if (askPrice === undefined || askPrice > limitPrice) {
       break;
     }
 
-    const askPrice = askPrices[0];
     const level = book.asks.get(askPrice);
 
     if (!level || level.length === 0) {
@@ -87,6 +87,11 @@ const matchAgainstAsks = (
     }
 
     const maker = level[0];
+    if (!maker) {
+      level.shift();
+      continue;
+    }
+
     const makerRemaining = round(maker.qty - maker.filledQty);
 
     if (makerRemaining <= 0) {
@@ -131,12 +136,12 @@ const matchAgainstBids = (
 
   while (remainingQty > 0) {
     const bidPrices = getSortedBidPrices(book);
+    const bidPrice = bidPrices[0];
 
-    if (bidPrices.length === 0 || bidPrices[0] < limitPrice) {
+    if (bidPrice === undefined || bidPrice < limitPrice) {
       break;
     }
 
-    const bidPrice = bidPrices[0];
     const level = book.bids.get(bidPrice);
 
     if (!level || level.length === 0) {
@@ -145,6 +150,11 @@ const matchAgainstBids = (
     }
 
     const maker = level[0];
+    if (!maker) {
+      level.shift();
+      continue;
+    }
+
     const makerRemaining = round(maker.qty - maker.filledQty);
 
     if (makerRemaining <= 0) {

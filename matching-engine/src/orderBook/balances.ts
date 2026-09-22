@@ -26,10 +26,6 @@ export const initUserBalances = (
   });
 };
 
-export const getUserBalances = (userId: string): Record<Asset, Balance> => {
-  return BALANCES.get(userId) ?? emptyBalance();
-};
-
 const getBalance = (userId: string, asset: Asset): Balance => {
   const balances = BALANCES.get(userId) ?? emptyBalance();
   return balances[asset];
