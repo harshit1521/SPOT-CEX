@@ -39,34 +39,18 @@ const setBalance = (userId: string, asset: Asset, balance: Balance): void => {
 
 export const lockForOrder = (
   userId: string,
-  side: Side,
-  price: number,
-  qty: number
+  asset: Asset,
+  amount: number
 ): void => {
-  if (side === "BUY") {
-    const requiredUsd = round(price * qty);
-    const usd = getBalance(userId, "USD");
+  const balance = getBalance(userId, asset);
 
-    if (usd.available < requiredUsd) {
-      throw new EngineError("Insufficient USD balance");
-    }
-
-    setBalance(userId, "USD", {
-      available: round(usd.available - requiredUsd),
-      locked: round(usd.locked + requiredUsd),
-    });
-    return;
+  if (balance.available < amount) {
+    throw new EngineError(`Insufficient ${asset} balance`);
   }
 
-  const btc = getBalance(userId, "BTC");
-
-  if (btc.available < qty) {
-    throw new EngineError("Insufficient BTC balance");
-  }
-
-  setBalance(userId, "BTC", {
-    available: round(btc.available - qty),
-    locked: round(btc.locked + qty),
+  setBalance(userId, asset, {
+    available: round(balance.available - amount),
+    locked: round(balance.locked + amount),
   });
 };
 

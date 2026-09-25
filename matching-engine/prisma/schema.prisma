@@ -1,0 +1,258 @@
+generator client {
+  provider   = "prisma-client"
+  output     = "./generated"
+  engineType = "client"
+  runtime    = "bun"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+//
+// USER
+//
+model User {
+  id                      Int                      @id @default(autoincrement())
+  email                   String                   @unique
+  username                String                   @unique
+  password                String
+
+  emailVerified           Boolean                  @default(false)
+  refreshToken            String?
+
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+
+  balances                Balance[]
+  orders                  Order[]
+  ledgerEntries           LedgerEntry[]
+  emailVerificationTokens EmailVerificationToken[]
+}
+
+//
+// EMAIL VERIFICATION
+//
+model EmailVerificationToken {
+  id        Int       @id @default(autoincrement())
+  tokenHash String    @unique
+  userId    Int
+
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+//
+// ORDER
+//
+model Order {
+  id            BigInt      @id @default(autoincrement())
+
+  // Client-generated idempotency key
+  clientOrderId String
+
+  // Matching-engine ordering
+  sequence      BigInt?
+
+  userId        Int
+  symbol        String
+
+  side          Side
+  orderType     OrderType
+
+  // NULL for MARKET orders
+  price         Decimal?    @db.Decimal(30, 10)
+
+  quantity      Decimal     @db.Decimal(30, 10)
+  filledQty     Decimal     @default(0) @db.Decimal(30, 10)
+
+  status        OrderStatus @default(PENDING)
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  user          User        @relation(fields: [userId], references: [id])
+
+  buyTrades     Trade[]     @relation("buyTrades")
+  sellTrades    Trade[]     @relation("sellTrades")
+
+  @@unique([userId, clientOrderId])
+  @@index([userId])
+  @@index([symbol, status])
+  @@index([symbol, side, price, sequence])
+}
+
+//
+// TRADE
+//
+// One Trade represents one successful match.
+//
+// Example:
+//
+// BUY  0.5 BTC
+// SELL 0.5 BTC
+// @ $98,000
+//
+// = one Trade
+//
+model Trade {
+  id          BigInt   @id @default(autoincrement())
+
+  symbol      String
+
+  price       Decimal  @db.Decimal(30, 10)
+  quantity    Decimal  @db.Decimal(30, 10)
+
+  buyOrderId  BigInt
+  sellOrderId BigInt
+
+  createdAt   DateTime @default(now())
+
+  buyOrder    Order    @relation("buyTrades", fields: [buyOrderId], references: [id])
+  sellOrder   Order    @relation("sellTrades", fields: [sellOrderId], references: [id])
+
+  @@index([symbol, createdAt])
+  @@index([buyOrderId])
+  @@index([sellOrderId])
+}
+
+//
+// BALANCE
+//
+// available = freely usable
+// locked    = reserved for open orders
+//
+model Balance {
+  id        Int      @id @default(autoincrement())
+
+  userId    Int
+  asset     Asset
+
+  available Decimal  @default(0) @db.Decimal(30, 10)
+  locked    Decimal  @default(0) @db.Decimal(30, 10)
+
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, asset])
+  @@index([userId])
+}
+
+//
+// LEDGER
+//
+// Records why a balance changed.
+//
+model LedgerEntry {
+  id          BigInt          @id @default(autoincrement())
+
+  userId      Int
+  asset       Asset
+
+  amount      Decimal         @db.Decimal(30, 10)
+
+  type        LedgerEntryType
+
+  // Order ID, Trade ID, etc.
+  referenceId String?
+
+  createdAt   DateTime        @default(now())
+
+  user        User            @relation(fields: [userId], references: [id])
+
+  @@index([userId, asset, createdAt])
+  @@index([referenceId])
+}
+
+//
+// OUTBOX EVENT
+//
+// Created in the SAME DB transaction as the Order
+// and Balance changes.
+//
+// Outbox worker later publishes this to Redis.
+//
+model OutboxEvent {
+  id          BigInt          @id @default(autoincrement())
+
+  eventId     String          @unique @default(uuid())
+
+  eventType   OutboxEventType
+
+  // ID of the entity this event belongs to.
+  // For ORDER_ACCEPTED this will be Order.id.
+  aggregateId String
+
+  // Event data
+  payload     Json
+
+  // NULL = not processed yet
+  processedAt DateTime?
+
+  createdAt   DateTime        @default(now())
+
+  @@index([processedAt, createdAt])
+  @@index([aggregateId])
+}
+
+//
+// PROCESSED EVENT
+//
+// Used to make Redis consumers idempotent.
+//
+model ProcessedEvent {
+  id          BigInt   @id @default(autoincrement())
+
+  eventId     String
+  consumer    String
+
+  processedAt DateTime @default(now())
+
+  @@unique([eventId, consumer])
+  @@index([consumer, processedAt])
+}
+
+//
+// ENUMS
+//
+enum Asset {
+  USD
+  BTC
+}
+
+enum Side {
+  BUY
+  SELL
+}
+
+enum OrderType {
+  LIMIT
+  MARKET
+}
+
+enum OrderStatus {
+  PENDING
+  PARTIALLY_FILLED
+  FILLED
+  CANCELLED
+}
+
+enum OutboxEventType {
+  ORDER_ACCEPTED
+  ORDER_CANCELLED
+}
+
+enum LedgerEntryType {
+  ORDER_LOCK
+  ORDER_UNLOCK
+  TRADE_DEBIT
+  TRADE_CREDIT
+  FEE
+}

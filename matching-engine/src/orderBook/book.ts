@@ -64,11 +64,11 @@ export const removeFromBook = (
 };
 
 export const getSortedAskPrices = (book: OrderBook): number[] => {
-  return [...book.asks.keys()].sort((a, b) => a - b);
+  return [...book.asks.keys()].sort((a, b) => a - b); // ascending order (lowest price first)
 };
 
 export const getSortedBidPrices = (book: OrderBook): number[] => {
-  return [...book.bids.keys()].sort((a, b) => b - a);
+  return [...book.bids.keys()].sort((a, b) => b - a); // descending order (highest price first)
 };
 
 const aggregateSide = (

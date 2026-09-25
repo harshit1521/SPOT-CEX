@@ -1,10 +1,10 @@
 import "dotenv/config";
 import { randomUUID } from "crypto";
 import { createClient, type RedisClientType } from "redis";
-import { matchOrder, cancelOrderOnBook } from "./src/orderBook/match.ts";
+import { matchOrder } from "./src/orderBook/match.ts";
 import { addToBook, getOrCreateBook } from "./src/orderBook/book.ts";
 import { initUserBalances } from "./src/orderBook/balances.ts";
-import { ORDERBOOKS, BALANCES } from "./src/orderBook/orderbook.ts";
+import { BALANCES } from "./src/orderBook/orderbook.ts";
 import type { RestingOrder } from "./src/orderBook/orderbook.ts";
 
 export { matchOrder, cancelOrderOnBook } from "./src/orderBook/match.ts";
@@ -16,8 +16,8 @@ const REDIS_URL = process.env.REDIS_URL ?? "redis://localhost:6379";
 const DATABASE_URL = process.env.DATABASE_URL ?? "";
 
 const STREAMS = {
-  ORDER_EVENTS: "cex:order-events",
-  EXECUTION_EVENTS: "cex:execution-events",
+  ORDER_EVENTS: "cex:place-order-stream",
+  EXECUTION_EVENTS: "cex:execution-event-stream",
 } as const;
 
 const CONSUMER_GROUP = "matching-engine";
@@ -34,6 +34,8 @@ interface OrderAcceptedPayload {
   price: string | null;
   quantity: string;
   quoteBudget: string | null;
+  lockedAsset: "USD" | "BTC";
+  lockedAmount: number;
   timestamp: number;
 }
 
@@ -91,7 +93,7 @@ async function bootstrapFromDb(): Promise<void> {
     return;
   }
 
-  const { PrismaClient } = await import("../server/prisma/generated/client.ts");
+  const { PrismaClient } = await import("./prisma/generated/client.ts");
   const { PrismaPg } = await import("@prisma/adapter-pg");
 
   const adapter = new PrismaPg({
@@ -197,7 +199,7 @@ async function processOrderAccepted(
   redis: RedisClientType,
   payload: OrderAcceptedPayload
 ): Promise<void> {
-  const { orderId, userId, symbol, side, orderType, price, quantity, quoteBudget } = payload;
+  const { orderId, userId, symbol, side, orderType, price, quantity, quoteBudget, lockedAsset, lockedAmount } = payload;
   const qty = parseFloat(quantity);
   const limitPrice = price != null ? parseFloat(price) : null;
 
@@ -210,7 +212,10 @@ async function processOrderAccepted(
       side,
       symbol,
       price: limitPrice,
+      quotePrice: quoteBudget != null ? parseFloat(quoteBudget) : null,
       qty,
+      lockedAsset,
+      lockedAmount,
     });
   } catch (err: unknown) {
     const errMsg = err instanceof Error ? err.message : String(err);

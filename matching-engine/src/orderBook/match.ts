@@ -6,6 +6,7 @@ import {
   lockForOrder,
   unlockRemaining,
 } from "./balances.ts";
+
 import {
   addToBook,
   getOrCreateBook,
@@ -13,6 +14,7 @@ import {
   getSortedBidPrices,
   removeFromBook,
 } from "./book.ts";
+
 import type {
   CreateOrderInput,
   FillResult,
@@ -189,43 +191,6 @@ const matchAgainstBids = (
   return remainingQty;
 };
 
-const getMarketBuyLockPrice = (symbol: string, qty: number): number => {
-  const book = getOrCreateBook(symbol);
-  let remaining = qty;
-  let maxPrice = 0;
-  let fillableQty = 0;
-
-  for (const askPrice of getSortedAskPrices(book)) {
-    const level = book.asks.get(askPrice) ?? [];
-
-    for (const order of level) {
-      const available = round(order.qty - order.filledQty);
-
-      if (available <= 0) {
-        continue;
-      }
-
-      const take = round(Math.min(remaining, available));
-      maxPrice = askPrice;
-      fillableQty = round(fillableQty + take);
-      remaining = round(remaining - take);
-
-      if (remaining <= 0) {
-        break;
-      }
-    }
-
-    if (remaining <= 0) {
-      break;
-    }
-  }
-
-  if (fillableQty <= 0 || maxPrice <= 0) {
-    throw new EngineError("Insufficient liquidity");
-  }
-
-  return maxPrice;
-};
 
 const buildResult = (
   order: RestingOrder,
@@ -266,7 +231,7 @@ const matchLimitOrder = (input: CreateOrderInput): MatchOrderResult => {
     createdAt: Date.now(),
   };
 
-  lockForOrder(input.userId, input.side, input.price, input.qty);
+  lockForOrder(input.userId, input.lockedAsset, input.lockedAmount);
 
   const fills: FillResult[] = [];
   const book = getOrCreateBook(input.symbol);
@@ -298,10 +263,10 @@ const matchMarketOrder = (input: CreateOrderInput): MatchOrderResult => {
   const fills: FillResult[] = [];
 
   if (input.side === "BUY") {
-    const lockPrice = getMarketBuyLockPrice(input.symbol, input.qty);
+    const lockPrice = input.lockedAmount / input.qty;
     order.price = lockPrice;
 
-    lockForOrder(input.userId, "BUY", lockPrice, input.qty);
+    lockForOrder(input.userId, input.lockedAsset, input.lockedAmount);
 
     const remainingQty = matchAgainstAsks(
       order,
@@ -320,7 +285,7 @@ const matchMarketOrder = (input: CreateOrderInput): MatchOrderResult => {
     return buildResult(order, input, remainingQty, fills);
   }
 
-  lockForOrder(input.userId, "SELL", 0, input.qty);
+  lockForOrder(input.userId, input.lockedAsset, input.lockedAmount);
 
   const remainingQty = matchAgainstBids(order, 0, fills);
 

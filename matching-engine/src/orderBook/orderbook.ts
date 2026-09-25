@@ -31,7 +31,10 @@ export interface CreateOrderInput {
   side: Side;
   symbol: string;
   price: number | null;
+  quotePrice?: number | null;
   qty: number;
+  lockedAsset: Asset;
+  lockedAmount: number;
 }
 
 // What a fill looks like right after a match, before/while it's persisted.
